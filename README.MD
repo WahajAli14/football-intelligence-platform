@@ -1,10 +1,12 @@
-# Football RAG API
+# Football Intelligence Platform
 
-A Retrieval-Augmented Generation (RAG) backend for searching and asking questions about football tactics. The project loads the 2025 UEFA Champions League technical report, splits it into chunks, stores embeddings in a persistent ChromaDB database, retrieves relevant passages, and uses an OpenAI model to generate answers grounded in those passages.
+A tactical intelligence assistant that helps football analysts research, compare, and explain football information using grounded evidence from multiple knowledge sources. The current implementation is a Retrieval-Augmented Generation (RAG) backend: it loads football knowledge sources (a built-in team profiles dataset and the 2025 UEFA Champions League technical report), splits them into chunks, stores embeddings in a persistent ChromaDB database, retrieves relevant passages, and uses an OpenAI model to generate answers grounded in those passages.
+
+RAG is the foundation of this project, not the final product. See [`PROJECT_PLAN.md`](PROJECT_PLAN.md) for the full architecture, phased roadmap (evaluation baseline → hybrid retrieval/reranking → context & guardrails → memory → ingestion platform → production engineering → security → MCP interface → agentic V2/V3), and the guiding principles behind it. See [`CLAUDE.md`](CLAUDE.md) for repo-specific working conventions.
 
 ## Project status
 
-The MVP is approximately **80% complete**.
+The current phase is **Phase 1 — Evaluation Baseline** (see `PROJECT_PLAN.md`). The RAG MVP described below is functionally complete and is the foundation the evaluation baseline will be measured against.
 
 | Area | Status | Notes |
 | --- | --- | --- |
@@ -47,21 +49,25 @@ The completion figure is an estimate for a usable local MVP, not a production-re
 ## Project structure
 
 ```text
-first-rag-project/
+football-intelligence-platform/
 ├── app/
 │   ├── api/routes.py               # API endpoints
-│   ├── config/                     # RAG defaults and model pricing
+│   ├── config/                     # RAG defaults, source registry, and model pricing
 │   ├── data/football_docs.py       # Small built-in football dataset
 │   ├── db/chroma_client.py         # Persistent ChromaDB client
 │   ├── models/                     # Request and response schemas
 │   ├── services/                   # Loading, chunking, retrieval, and generation
-│   ├── chroma_db/                  # Local persistent vector database
+│   ├── chroma_db/                  # Local persistent vector database (gitignored)
 │   └── main.py                     # FastAPI application entry point
-├── data/raw/pdfs/                  # Source PDFs
-├── logs/                           # Chunking experiment logs
+├── data/
+│   ├── README.md                   # Where to obtain source documents (not committed)
+│   └── raw/pdfs/                   # Source PDFs (gitignored; see data/README.md)
+├── logs/                           # Chunking experiment logs (gitignored)
 ├── scripts/ingest_pdf.py           # UEFA report ingestion command
 ├── test_chroma.py                  # Basic ChromaDB connectivity check
 ├── requirements.txt
+├── PROJECT_PLAN.md                 # Full architecture and phased roadmap
+├── CLAUDE.md                       # Repo-specific conventions for Claude Code
 └── README.MD
 ```
 
@@ -113,13 +119,13 @@ OPENAI_MODEL=gpt-4.1-mini
 
 ## Ingest the PDF
 
-The repository includes this source document:
+The source PDF is **not** committed to this repository (large file; third-party redistribution terms unclear). See [`data/README.md`](data/README.md) for where to obtain it. Place it at:
 
 ```text
 data/raw/pdfs/UCL_Technical-Report_2025_DIGITAL.pdf
 ```
 
-Ingest it before searching if the `ucl_technical_report_2025` collection is missing or needs to be rebuilt:
+Then ingest it before searching if the `ucl_technical_report_2025` collection is missing or needs to be rebuilt:
 
 ```bash
 python -m scripts.ingest_pdf
