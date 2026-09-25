@@ -1,0 +1,8 @@
+fastapi==0.136.1
+uvicorn==0.46.0
+chromadb==1.5.9
+python-dotenv==1.2.2
+openai==1.70.0
+pypdf>=6.12.2
+unstructured[pdf]>=0.24.0
+pdfminer.six>=20250506

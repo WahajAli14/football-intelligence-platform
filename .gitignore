@@ -1,0 +1,16 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Vector database (regenerate via scripts/ingest_pdf.py)
+app/chroma_db/
+
+# Source documents (not redistributed; see data/README.md)
+data/raw/pdfs/
+
+# Generated runtime logs
+logs/
