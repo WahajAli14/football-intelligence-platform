@@ -71,8 +71,13 @@ def search_accross_sources(
     
     # Sort by similarity score in descending order
     all_results.sort(key=lambda x: x["similarity_score"], reverse=True)
-    
-    return all_results[:n_results]
+    top_results = all_results[:n_results]
+
+    # Per-source ranks are meaningless after merging; reassign a global rank.
+    for global_rank, result in enumerate(top_results, start=1):
+        result["rank"] = global_rank
+
+    return top_results
 
 
 def search_and_display(query: str):

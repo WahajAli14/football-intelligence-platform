@@ -3,6 +3,11 @@ from typing import Any, Dict
 
 from app.services.document_loader import DocumentLoader
 from app.services.vector_store_chunked import add_documents_with_chunking
+from app.config.rag import (
+    DEFAULT_CHUNK_SIZE,
+    DEFAULT_CHUNK_OVERLAP,
+    DEFAULT_CHUNK_STRATEGY,
+)
 
 
 PDF_PATH = "data/raw/pdfs/UCL_Technical-Report_2025_DIGITAL.pdf"
@@ -29,9 +34,9 @@ def ingest_pdf(file_path: str=PDF_PATH, collection_name: str=COLLECTION_NAME) ->
     result = add_documents_with_chunking(
         [documents],
         collection_name,
-        800,
-        100,
-        "fixed",
+        DEFAULT_CHUNK_SIZE,
+        DEFAULT_CHUNK_OVERLAP,
+        DEFAULT_CHUNK_STRATEGY,
         recreate=True,
         verbose=True
     )

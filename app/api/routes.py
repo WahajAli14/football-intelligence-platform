@@ -11,6 +11,7 @@ from app.models import (
 )
 from app.services.rag_chain import get_rag_chain
 from app.services.rag_service import search_accross_sources
+from app.services.llm_service import LLMServiceError
 
 router = APIRouter(prefix="/api/v1", tags=["football documents"])
 
@@ -99,12 +100,15 @@ async def ask_football_question(request: SearchRequest):
         for source_id in request.source_ids
     ]
 
-    response = rag_chain.ask(
-        query=request.query,
-        source_ids=source_ids,
-        n_results=request.n_results,
-    )
-    
+    try:
+        response = rag_chain.ask(
+            query=request.query,
+            source_ids=source_ids,
+            n_results=request.n_results,
+        )
+    except LLMServiceError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+
     return AskResponse(
         query=response["query"],
         answer=response["answer"],

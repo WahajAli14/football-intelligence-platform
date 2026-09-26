@@ -93,6 +93,7 @@ class DocumentChunker:
 
         while start < text_length:
             end = min(start + self.chunk_size, text_length)
+            end_offset = -1
             if end < text_length:
                 search_end = min(end + 50, text_length)
                 end_offset = self._find_sentence_boundary(text[end: search_end])
@@ -184,8 +185,8 @@ class DocumentChunker:
                 ))
                 chunk_index += 1
                 char_position += len(chunk_text) + 2
-                current_chunk = [current_chunk[-1]] if current_chunk else []
-                current_length = len(current_chunk[-1]) if current_chunk else 0
+                current_chunk = self._take_overlap_sentences(current_chunk)
+                current_length = sum(len(s) for s in current_chunk)
             current_chunk.append(sentence)
             current_length += sentence_len
 
@@ -200,7 +201,21 @@ class DocumentChunker:
             ))
 
         return chunks
-    
+
+    def _take_overlap_sentences(self, sentences: List[str]) -> List[str]:
+        """
+        Select complete trailing sentences to carry into the next chunk,
+        targeting self.overlap characters without splitting a sentence.
+        """
+        overlap_sentences: List[str] = []
+        overlap_length = 0
+        for sentence in reversed(sentences):
+            if overlap_length >= self.overlap:
+                break
+            overlap_sentences.insert(0, sentence)
+            overlap_length += len(sentence)
+        return overlap_sentences
+
     def _find_sentence_boundary(self, text: str) -> int:
         """Find the nearest sentence boundary before the given index."""
         for i, char in enumerate(text):

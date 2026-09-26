@@ -8,6 +8,14 @@ from app.config.pricing import calculate_cost, get_model_pricing
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
+
+class LLMServiceError(Exception):
+    """Raised when answer generation fails. `status_code` is the HTTP status the API layer should return."""
+
+    def __init__(self, message: str, status_code: int = 502):
+        super().__init__(message)
+        self.status_code = status_code
+
 class LLMService:
     """
     Service for interacting with OpenAI's language models.
@@ -149,25 +157,28 @@ class LLMService:
                 "cost_usd": cost
             }
 
-        except AuthenticationError:
+        except AuthenticationError as e:
             print("OpenAI authentication failed. Check OPENAI_API_KEY.")
-            return "OpenAI authentication failed. Check your API key."
-        except NotFoundError:
+            raise LLMServiceError("OpenAI authentication failed. Check your API key.", status_code=500) from e
+        except NotFoundError as e:
             print(f"OpenAI model not found or not accessible: {self.model}")
-            return f"The configured OpenAI model '{self.model}' is not available for this API project."
+            raise LLMServiceError(
+                f"The configured OpenAI model '{self.model}' is not available for this API project.",
+                status_code=500,
+            ) from e
         except RateLimitError as e:
             if "insufficient_quota" in str(e):
                 print("OpenAI quota exceeded. Check your plan and billing details.")
-                return "OpenAI quota exceeded. Check your plan and billing details."
+                raise LLMServiceError("OpenAI quota exceeded. Check your plan and billing details.", status_code=503) from e
 
             print("OpenAI rate limit exceeded. Try again later.")
-            return "OpenAI rate limit exceeded. Try again later."
+            raise LLMServiceError("OpenAI rate limit exceeded. Try again later.", status_code=503) from e
         except OpenAIError as e:
             print(f"OpenAI API error during LLM generation: {e}")
-            return "An OpenAI API error occurred while generating the answer."
+            raise LLMServiceError("An OpenAI API error occurred while generating the answer.", status_code=502) from e
         except Exception as e:
             print(f"Unexpected error during LLM generation: {e}")
-            return "An unexpected error occurred while generating the answer."
+            raise LLMServiceError("An unexpected error occurred while generating the answer.", status_code=500) from e
 
     def get_stats(self) -> Dict[str, Any]:
         """Get current usage statistics."""
