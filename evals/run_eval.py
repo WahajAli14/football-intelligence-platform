@@ -56,7 +56,11 @@ def build_evaluation_dataset():
 
 
 if __name__ == "__main__":
+    rag_chain.reset_stats()
+
     dataset, failures = build_evaluation_dataset()
+
+    stats = rag_chain.get_stats()
 
     print(f"\nCompleted {len(dataset)}/{len(evaluation_questions)} evaluation samples.")
     if failures:
@@ -70,3 +74,9 @@ if __name__ == "__main__":
         print("Answer:", sample.response)
         print("Reference:", sample.reference)
         print("Retrieved contexts:", len(sample.retrieved_contexts))
+
+    print("\nEvaluation Run Stats:")
+    print(f"Requests: {stats['total_requests']}")
+    print(f"Input tokens: {stats['total_input_tokens']}")
+    print(f"Output tokens: {stats['total_output_tokens']}")
+    print(f"Total cost: ${stats['total_cost_usd']:.6f}")

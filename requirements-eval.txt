@@ -1,0 +1,13 @@
+# Evaluation-only dependencies (RAGAS baseline, Phase 1).
+#
+# ragas pulls in a large, fast-moving stack (langchain, langgraph, instructor,
+# a newer openai than production uses, etc.) that has no business dictating
+# the production app's dependency versions. Install this into a SEPARATE
+# virtual environment, not the app's own .venv:
+#
+#   python3 -m venv .venv-eval
+#   .venv-eval/bin/pip install -r requirements-eval.txt
+#   .venv-eval/bin/python -m evals.run_eval
+#
+-r requirements.txt
+ragas==0.4.3

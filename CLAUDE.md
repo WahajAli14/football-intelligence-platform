@@ -20,23 +20,24 @@ plan considers the prerequisites for it complete.
 
 ## Current phase
 
-**Phase 1 — Evaluation Baseline.** Immediate execution path per
-`PROJECT_PLAN.md`:
+**Phase 1 — Evaluation Baseline.** Progress per `PROJECT_PLAN.md`'s Immediate
+Execution Path:
 
-1. Inspect the current `RAGChain` / retrieval / source-ID / request-response
-   configuration (don't assume — verify against the actual code).
-2. Document the baseline configuration (embedding model, chunking strategy,
-   chunk size/overlap, `n_results`, retrieval mode, generation model).
-3. Build `evals/questions.py` (~15 test cases: football-profile factual,
-   UEFA-report factual, cross-source, multi-context, hallucination-resistance).
-4. Build `evals/run_eval.py`, calling the real `rag_chain.ask()` — never a
-   parallel mock path.
-5. Run RAGAS metrics (Faithfulness, Answer/Response Relevancy, Context
-   Precision, Context Recall) and record the baseline before changing
-   retrieval.
+1. ✅ `evals/questions.py` — 17 test cases covering all five required
+   categories (football-profile factual, UEFA-report factual, multi-context
+   single-source, cross-source, hallucination-resistance). Every reference was
+   independently verified against the actual source documents.
+2. ✅ `evals/run_eval.py` — runs every question through the real
+   `rag_chain.ask()` (never a mock path) and builds a `ragas`
+   `EvaluationDataset` of `SingleTurnSample`s. Per-question failures are
+   isolated so one bad call doesn't lose the whole run. Stats are scoped to
+   the run via `reset_stats()` before and `get_stats()` after.
+3. ⬜ Not yet done: wiring up actual RAGAS metrics (Faithfulness, Context
+   Precision/Recall, Answer Relevancy) on top of that dataset, and recording
+   the baseline result. This is the next step.
 
-Do not add hybrid retrieval, reranking, memory, or agents until this baseline
-exists and later phases explicitly build on it.
+Do not add hybrid retrieval, reranking, memory, or agents until the baseline
+is recorded and later phases explicitly build on it.
 
 ## Architecture
 
@@ -90,6 +91,31 @@ python test_chroma.py               # basic ChromaDB connectivity check
 
 Requires a `.env` with `OPENAI_API_KEY` (see README.MD). Never commit `.env`.
 
+### Running evaluations
+
+Evaluation tooling (`ragas`) lives in a **separate virtual environment**, not
+`.venv` — `ragas` pulls in a large, fast-moving dependency stack (langchain,
+langgraph, instructor, etc.) that has no reason to dictate the production
+API's dependency versions:
+
+```bash
+python3.13 -m venv .venv-eval
+.venv-eval/bin/pip install -r requirements-eval.txt
+.venv-eval/bin/python -m evals.run_eval
+```
+
+`requirements-eval.txt` is `-r requirements.txt` plus `ragas` — production's
+`openai` pin must stay compatible with whatever `ragas` needs (`ragas`'s own
+`instructor`/`langchain-openai` dependencies require `openai>=2.45`), since
+both venvs are built from the same `requirements.txt` base. If you ever bump
+`openai` in `requirements.txt`, rebuild `.venv` and rerun full regression
+(`test_chroma.py`, `/search`, `/ask`, a forced OpenAI error) before rebuilding
+`.venv-eval` on top of it.
+
+`evals/_ragas_compat.py` is a **temporary** workaround for an open upstream
+`ragas` bug (unconditional import of a removed `langchain_community` module —
+see the file for issue links). Delete it once `ragas` ships a fix.
+
 ## Repo hygiene
 
 - `.env`, `app/chroma_db/` (regenerable vector DB), `data/raw/pdfs/` (source
@@ -103,12 +129,13 @@ Requires a `.env` with `OPENAI_API_KEY` (see README.MD). Never commit `.env`.
 
 ## Known code issues (flagged, not yet fixed)
 
-- `app/services/llm_service.py` `generate_answer()`: several error paths
-  (auth error, not-found, rate limit, generic `OpenAIError`) return a plain
-  string instead of the `{"answer", "usage", "cost_usd"}` dict shape that
-  `rag_chain.ask()` expects — this raises a `TypeError` on those paths
-  instead of surfacing a clean error.
-- `app/api/routes.py`: the empty-query check
-  (`if not request.query.strip() and len(request.query.strip()) == 0`) is
-  redundant and unreachable anyway, since `SearchRequest.query` already has
-  `min_length=1`.
+- `/search` requires `OPENAI_API_KEY` to be set even though it never calls
+  OpenAI, because `routes.py` calls `get_rag_chain()` at import time, which
+  eagerly constructs `LLMService()`. A pure retrieval service (no LLM
+  dependency) would let `/search` work independently of `/ask`.
+- CORS is wide open (`allow_origins=["*"]`) — fine for local dev, needs
+  explicit origins before any real deployment (Phase 6/7).
+- `/health` returns a hardcoded `"documents_available": 8` regardless of
+  actual collection state.
+- `app/services/chunking.py`: fallback doc id typo, `'unkown'` instead of
+  `'unknown'` (cosmetic).

@@ -5,6 +5,7 @@
 __pycache__/
 *.pyc
 .venv/
+.venv-eval/
 
 # Vector database (regenerate via scripts/ingest_pdf.py)
 app/chroma_db/
