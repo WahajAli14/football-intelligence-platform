@@ -237,6 +237,14 @@ Arguments are query, chunking strategy, chunk size, and overlap. Valid strategie
 
 ## Known limitations and next work
 
+- The RAGAS `Context Precision` metric used in the Phase 1 evaluation baseline
+  (`evals/`) is not meaningful for the `multi_context` and `unsupported`
+  question categories — it judges each retrieved chunk in isolation against
+  the full reference answer, which structurally can't score a multi-team
+  comparison or a "no relevant data exists" question correctly. Read Context
+  Precision per-category (`evals/analyze_results.py`), not as a single
+  aggregate, and see `PROJECT_PLAN.md` Phase 1 for the full explanation
+  before treating a low aggregate score as a retrieval problem.
 - Add unit and integration tests for loaders, chunking, retrieval, and every endpoint.
 - Make the collection name and ingestion settings environment-configurable.
 - Validate collection availability and document counts dynamically in the health endpoint.

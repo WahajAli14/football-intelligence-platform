@@ -23,7 +23,7 @@ plan considers the prerequisites for it complete.
 **Phase 1 — Evaluation Baseline.** Progress per `PROJECT_PLAN.md`'s Immediate
 Execution Path:
 
-1. ✅ `evals/questions.py` — 17 test cases covering all five required
+1. ✅ `evals/questions.py` — 23 test cases covering all five required
    categories (football-profile factual, UEFA-report factual, multi-context
    single-source, cross-source, hallucination-resistance). Every reference was
    independently verified against the actual source documents.
@@ -32,12 +32,18 @@ Execution Path:
    `EvaluationDataset` of `SingleTurnSample`s. Per-question failures are
    isolated so one bad call doesn't lose the whole run. Stats are scoped to
    the run via `reset_stats()` before and `get_stats()` after.
-3. ⬜ Not yet done: wiring up actual RAGAS metrics (Faithfulness, Context
-   Precision/Recall, Answer Relevancy) on top of that dataset, and recording
-   the baseline result. This is the next step.
+3. ✅ RAGAS metrics (Faithfulness, Context Precision/Recall, Answer
+   Relevancy) wired up via `evals/judge.py` (locked judge: `gpt-4.1`,
+   `temperature=0` — see that file's docstring for why) and scored with
+   rate-limit handling and per-question checkpointing. Baseline recorded in
+   `evals/results/`; breakdown by category via `evals/analyze_results.py`.
+   See `PROJECT_PLAN.md` Phase 1 §4.3 for a known Context Precision
+   limitation on the `multi_context`/`unsupported` categories — read that
+   before treating a low aggregate score as a retrieval problem.
 
-Do not add hybrid retrieval, reranking, memory, or agents until the baseline
-is recorded and later phases explicitly build on it.
+Phase 1 is complete. Do not add hybrid retrieval, reranking, memory, or
+agents (Phase 2+) without discussing it first, even though the baseline
+prerequisite is now satisfied.
 
 ## Architecture
 

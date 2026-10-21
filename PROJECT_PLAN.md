@@ -284,6 +284,38 @@ Later add:
 Store evaluation outputs so later retrieval changes can be compared against the
 baseline.
 
+#### Known limitation: Context Precision on multi-context and unsupported questions
+
+`ContextPrecisionWithReference` (ragas 0.4.3, `ragas.metrics.collections`)
+judges each retrieved chunk **individually** against the full reference
+answer ("does this one chunk, by itself, support the whole reference?"). That
+breaks down for two of our five question categories:
+
+- **`multi_context`** (comparison questions, e.g. "compare Real Madrid and
+  Bayern Munich's transition play"): our knowledge base stores facts one team
+  per chunk, so no single chunk can ever satisfy a reference answer that
+  synthesizes two teams. Verified directly (by replaying the judge's
+  per-chunk calls and reading the discarded `reason` field) that retrieval
+  was fetching the correct chunks for these questions; every chunk still
+  scored "not useful" purely because of the single-chunk-vs-whole-reference
+  check. Context Precision on this category should be expected to sit near
+  zero regardless of retrieval quality — it is not a retrieval signal here.
+- **`unsupported`** (hallucination-resistance questions, where the reference
+  itself is "the sources don't contain this"): there's no principled
+  definition of a "useful" chunk when the correct answer is that nothing is
+  relevant. Observed the judge give inconsistent verdicts across
+  near-identical chunks for this reason (e.g. marking only one of three
+  equally Chelsea-free chunks as "supporting" the no-data conclusion),
+  producing a near-arbitrary score anywhere from 0 to ~1 depending on chunk
+  order.
+
+Read Context Precision only for `football_profile`, `uefa_report`, and
+`cross_source` categories (use `evals/analyze_results.py`'s per-category
+breakdown, not the single aggregate number). Faithfulness, Answer Relevancy,
+and Context Recall are not subject to this limitation. Do not "fix" retrieval
+in response to a low aggregate Context Precision without first checking
+whether it's being dragged down by `multi_context`/`unsupported` rows.
+
 ### 4.4 Retrieval Experiment Discipline
 
 Every meaningful retrieval change should be treated as an experiment rather
