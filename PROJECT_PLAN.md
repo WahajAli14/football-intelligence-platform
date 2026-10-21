@@ -357,24 +357,16 @@ more advanced. It should show measurable value.
 
 ## Phase 2 - Retrieval Quality
 
-After the baseline is measured:
+After the baseline is measured, and before any retrieval experiment runs,
+add a deterministic ground-truth layer so retrieval quality can be judged
+independently of the RAGAS judge model. This is necessary given the Context
+Precision limitation documented in Phase 1 §4.3 — an LLM judge alone cannot
+be trusted to say whether a retrieval change actually helped.
 
-### Metadata Filtering
+### 2A - Metadata and Gold Retrieval Labels
 
-Support filtering by useful metadata such as:
-
-- source
-- document
-- team
-- competition
-- season
-- page or section where available
-
-Do not expose raw database collection names to public clients.
-
-### Better Source and Document Metadata
-
-Add richer identifiers:
+Add richer, stable identifiers (prerequisite for both gold labeling and
+later filtering):
 
 - source ID
 - document ID
@@ -384,7 +376,39 @@ Add richer identifiers:
 - chunk position
 - ingestion version
 
-### Hybrid Retrieval
+Do not expose raw database collection names to public clients.
+
+Build a gold retrieval set: for each of the 23 questions in
+`evals/questions.py`, manually label which chunk/document IDs are actually
+relevant. This is one-time manual work — budget real time per question, not
+a few minutes each; `multi_context`/`cross_source` questions may have
+several relevant chunks each, and under-labeling would create false
+"recall" failures in every experiment that follows.
+
+With gold labels in place, compute deterministic IR metrics directly
+against them — no LLM involved, fully reproducible run to run:
+
+- Recall@k
+- Precision@k
+- MRR (Mean Reciprocal Rank)
+- nDCG@k (most useful once reranking, 2D, is in place — it specifically
+  rewards ordering, not just membership)
+
+Report these alongside the existing RAGAS metrics for every retrieval
+experiment from here on:
+
+```text
+Recall@3, Precision@3, MRR, (nDCG@3)
+RAGAS Context Precision, RAGAS Context Recall
+RAGAS Faithfulness, RAGAS Answer Relevancy
+latency, token usage, estimated cost
+```
+
+Do not treat a RAGAS-only comparison as sufficient evidence that a retrieval
+change helped — cross-check against the deterministic numbers, especially
+given the Context Precision limitation already found.
+
+### 2B - Hybrid Retrieval
 
 Combine:
 
@@ -392,11 +416,44 @@ Dense/vector retrieval
 +
 Lexical/BM25 retrieval
 
-Normalize and merge candidate scores.
+Fuse with Reciprocal Rank Fusion (RRF): score each document as the sum of
+`1/(k + rank)` across each ranking (k = 60, per the original paper), rather
+than trying to normalize incompatible raw similarity/BM25 score scales.
+(Cormack, Clarke, Büttcher, "Reciprocal Rank Fusion Outperforms Condorcet
+and Individual Rank Learning Methods," SIGIR 2009.)
 
-### Reranking
+Evaluate against the same final top-k as the current baseline, using both
+the deterministic metrics from 2A and RAGAS.
 
-Retrieve a wider candidate pool and rerank the candidates before generation.
+### 2C - Explicit Metadata Filtering
+
+Support filtering by:
+
+- source
+- document
+- team
+- competition
+- season
+- page or section where available
+
+Filtering must be explicit and caller-visible — applied only when the
+query/caller actually specifies a scope (e.g. "use only the UEFA report"),
+never silently inferred by the system. An incorrectly inferred restrictive
+filter can drop recall to zero for evidence that exists in an excluded
+source.
+
+Evaluate filtering as its own experiment, separate from hybrid retrieval. It
+is primarily a scoping/precision feature for already-scoped queries, not
+expected to be the main fix for the recall/ranking issues found in Phase 1 —
+but don't assume that without checking; it may still give targeted
+precision gains on queries that already name a team, competition, or
+source.
+
+### 2D - Reranking
+
+Retrieve a wider candidate pool (from 2B's hybrid retrieval) and rerank
+before generation, keeping the final context count fixed so the comparison
+to baseline stays apples-to-apples.
 
 Target flow:
 
@@ -408,6 +465,9 @@ Query
  -> final contexts
  -> LLM
 ```
+
+nDCG@k becomes the most informative deterministic metric at this stage,
+since reranking is fundamentally an ordering problem.
 
 For advanced experimentation in V3, a JEV-based stage may be evaluated after
 the standard reranker:
@@ -429,7 +489,8 @@ LLM
 JEV is optional. It should only remain if evaluation shows measurable
 improvement over the simpler reranking pipeline.
 
-Measure every major retrieval change against the RAGAS baseline.
+Measure every major retrieval change against the baseline — both RAGAS and
+the deterministic metrics from 2A.
 
 ## Phase 3 - Context, Grounding and Advanced Guardrails
 
