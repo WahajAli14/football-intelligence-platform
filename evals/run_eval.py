@@ -47,6 +47,7 @@ CHECKPOINT_PATH = RESULTS_DIR / "checkpoint.json"
 def build_evaluation_dataset():
     completed_samples = []
     failures = []
+    chunk_ids_by_question = {}
 
     for i, item in enumerate(evaluation_questions, 1):
         print(f"[{i}/{len(evaluation_questions)}] {item['user_input']}")
@@ -74,8 +75,12 @@ def build_evaluation_dataset():
         )
 
         completed_samples.append(sample)
+        # which chunks were retrieved (needed for gold-label verification).
+        chunk_ids_by_question[item["user_input"]] = [
+            doc["chunk_id"] for doc in result["retrieved_documents"]
+        ]
 
-    return EvaluationDataset(samples=completed_samples), failures
+    return EvaluationDataset(samples=completed_samples), failures, chunk_ids_by_question
 
 
 JUDGE_CONCURRENCY = 2
@@ -142,7 +147,12 @@ def _save_checkpoint(rows_by_question):
     tmp_path.replace(CHECKPOINT_PATH)  # atomic on POSIX - never leaves a half-written checkpoint.json
 
 
-async def _score_one_question(sample, category, faithfulness, answer_relevancy, context_precision, context_recall):
+async def _score_one_question(
+    sample, category,
+    retrieved_chunk_ids,
+    faithfulness, answer_relevancy,
+    context_precision, context_recall
+):
     faithfulness_input = {
         "user_input": sample.user_input,
         "response": sample.response,
@@ -177,6 +187,7 @@ async def _score_one_question(sample, category, faithfulness, answer_relevancy, 
         "category": category,
         "answer": sample.response,
         "reference": sample.reference,
+        "retrieved_chunk_ids": retrieved_chunk_ids,
         "faithfulness": faithfulness_result["value"],
         "faithfulness_reason": faithfulness_result["reason"],
         "answer_relevancy": relevancy_result["value"],
@@ -188,7 +199,7 @@ async def _score_one_question(sample, category, faithfulness, answer_relevancy, 
     }
 
 
-async def score_dataset(dataset, category_by_question):
+async def score_dataset(dataset, category_by_question, chunk_ids_by_question):
     judge_llm = build_judge_llm()
     judge_embeddings = build_judge_embeddings()
 
@@ -210,6 +221,7 @@ async def score_dataset(dataset, category_by_question):
             _score_one_question(
                 sample,
                 category_by_question[sample.user_input],
+                chunk_ids_by_question[sample.user_input],
                 faithfulness,
                 answer_relevancy,
                 context_precision,
@@ -236,7 +248,7 @@ def _mean(values):
 if __name__ == "__main__":
     rag_chain.reset_stats()
 
-    dataset, failures = build_evaluation_dataset()
+    dataset, failures, chunk_ids_by_question = build_evaluation_dataset()
 
     stats = rag_chain.get_stats()
 
@@ -248,7 +260,7 @@ if __name__ == "__main__":
 
     category_by_question = {q["user_input"]: q["category"] for q in evaluation_questions}
 
-    rows_by_question = asyncio.run(score_dataset(dataset, category_by_question))
+    rows_by_question = asyncio.run(score_dataset(dataset, category_by_question, chunk_ids_by_question))
 
     per_question = []
     for sample in dataset:

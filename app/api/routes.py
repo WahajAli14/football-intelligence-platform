@@ -73,6 +73,7 @@ async def search_documents(request: SearchRequest):
 
     for doc in raw_results:
         formatted_results.append(DocumentResult(
+            chunk_id=doc["chunk_id"],
             document=doc["document"],
             metadata=doc["metadata"],
             similarity_score=doc["similarity_score"],

@@ -6,15 +6,17 @@ from typing import List, Dict, Any
 
 class DocumentResult(BaseModel):
     """Individual document result from retrieval."""
-    
+
+    chunk_id: str = Field(..., examples=["arsenal_profile_chunk0"])
     document: str = Field(..., examples=["Arsenal usually rely on structured possession..."])
     metadata: Dict[str, Any] = Field(..., example={"team": "Arsenal", "tactical_approach": "High Pressing"})
     similarity_score: float = Field(..., examples=[0.4653])
     rank: int = Field(..., examples=[1])
-    
+
     class Config:
         json_schema_extra = {
             "example": {
+                "chunk_id": "arsenal_profile_chunk0",
                 "document": "Arsenal usually rely on structured possession, high pressing...",
                 "metadata": {"team": "Arsenal", "tactical_approach": "High Pressing"},
                 "similarity_score": 0.4653,

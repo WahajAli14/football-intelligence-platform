@@ -24,8 +24,9 @@ def retrieve_similar_documents(query: str, collection_name:str=DEFAULT_COLLECTIO
     retrieved_docs = []
 
     if results["documents"] and len(results["documents"][0]) > 0:
-        for i, (doc, meta, dist) in enumerate(
+        for i, (chunk_id, doc, meta, dist) in enumerate(
             zip(
+                results["ids"][0],
                 results["documents"][0],
                 results["metadatas"][0],
                 results["distances"][0]
@@ -33,6 +34,7 @@ def retrieve_similar_documents(query: str, collection_name:str=DEFAULT_COLLECTIO
             start=1
         ):
             retrieved_docs.append({
+                "chunk_id": chunk_id,
                 "document": doc,
                 "metadata": meta,
                 "similarity_score": round(1 / (1 + dist), 4),
