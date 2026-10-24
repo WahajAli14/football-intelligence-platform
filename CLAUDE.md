@@ -135,6 +135,11 @@ see the file for issue links). Delete it once `ragas` ships a fix.
 
 ## Known code issues (flagged, not yet fixed)
 
+See `EVAL_FINDINGS.md` for the resolved counterpart - failure points
+already diagnosed and fixed (or deliberately deferred with a documented
+reason) while building the evaluation pipeline. Check there before
+re-investigating something from scratch.
+
 - `/search` requires `OPENAI_API_KEY` to be set even though it never calls
   OpenAI, because `routes.py` calls `get_rag_chain()` at import time, which
   eagerly constructs `LLMService()`. A pure retrieval service (no LLM

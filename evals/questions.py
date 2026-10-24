@@ -140,10 +140,14 @@ evaluation_questions = [
         "source_ids": ["football_profiles", "ucl_2025"],
         "category": "unsupported",
     },
+
+    # --- PARTIAL EVIDENCE (relevant evidence exists, but is insufficient to
+    # fully answer the question - distinct from "unsupported", where no
+    # relevant evidence exists at all. See evals/gold_labels.py.) ---
     {
         "user_input": "According to the UEFA report, how many goals did Erling Haaland score in the competition?",
-        "reference": "The available sources do not provide enough information about Erling Haaland's goal tally in the competition.",
+        "reference": "The report mentions Erling Haaland, including a goal against Sparta Praha, but it does not provide his cumulative goal tally for the competition.",
         "source_ids": ["football_profiles", "ucl_2025"],
-        "category": "unsupported",
+        "category": "partial_evidence",
     },
 ]

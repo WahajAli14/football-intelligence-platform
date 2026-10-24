@@ -1,10 +1,11 @@
 """Vector Store with Chunking - Add chunked documents to ChromaDB"""
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import logging
 from typing import List, Dict, Any, Optional
 
+from app.config.rag import INDEX_VERSION
 from app.db.chroma_client import get_chroma_client, get_or_create_collection
 from app.services.chunking import DocumentChunker
 from app.services.rag_service import retrieve_similar_documents
@@ -122,25 +123,38 @@ def add_documents_with_chunking(
     "status": "no_chunks"
         }
     
-    if verbose: 
+    if verbose:
         print(f"📄 Created {len(chunked_docs)} chunks from {len(documents)} documents")
-    
+
     # Prepare for ChromaDB
     ids = []
     texts=[]
     metadatas=[]
 
+    ingested_at = datetime.now(timezone.utc).isoformat()
+    chunk_total_by_parent: Dict[str, int] = {}
     for doc in chunked_docs:
-        ids.append(doc["id"])
-        texts.append(doc["text"])
+        parent_id = doc.get("parent_id", "unknown")
+        chunk_total_by_parent[parent_id] = chunk_total_by_parent.get(parent_id, 0) + 1
+
+    for doc in chunked_docs:
+        parent_id = doc.get("parent_id", "unknown")
         metadatas.append({
             "title": doc.get("title", ""),
-            "parent_id": doc.get("parent_id", "unknown"),
+            "parent_id": parent_id,
             "chunk_index": doc.get("chunk_index", 0),
             "chunk_start": doc.get("char_start", 0),
             "chunk_end": doc.get("char_end", 0),
-            "source": doc.get("source", "unknown")
+            "source": doc.get("source", "unknown"),
+            "chunk_total": chunk_total_by_parent[parent_id],
+            "chunk_strategy": strategy,
+            "chunk_size": chunk_size,
+            "chunk_overlap": chunk_overlap,
+            "ingested_at": ingested_at,
+            "index_version": INDEX_VERSION,
         })
+        ids.append(doc["id"])
+        texts.append(doc["text"])
 
     collection.add(
         ids=ids,

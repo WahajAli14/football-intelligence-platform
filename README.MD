@@ -255,6 +255,34 @@ Arguments are query, chunking strategy, chunk size, and overlap. Valid strategie
 - Add Docker and deployment configuration.
 - Add CI checks for formatting, linting, and tests.
 
+## Evaluation findings
+
+Building the Phase 1/2A evaluation pipeline (`evals/`) surfaced several
+failure points worth knowing before touching that code again. Full
+write-up, with root cause and resolution for each, is in
+[`EVAL_FINDINGS.md`](EVAL_FINDINGS.md):
+
+- GPT-5+/6+ models reject `temperature != 1` outright, which made an early
+  judge model (`gpt-6-luna`) produce genuinely non-reproducible scores —
+  resolved by judging with `gpt-4.1` instead.
+- A 30,000 TPM rate limit caused 64% of judge calls to fail on the first
+  full run — resolved with a concurrency cap and backoff retry.
+- RAGAS's modern metrics (`ragas.metrics.collections`, v0.4.3) never
+  populate `.reason` on any score — confirmed from the library's own
+  source, not a bug in this repo's code.
+- `Context Precision` is structurally unreliable for two of the five
+  question categories (see "Known limitations" above).
+- `chunk_id` was being silently dropped from the retrieval pipeline,
+  blocking any attempt to trace a retrieved document back to its source
+  chunk — now surfaced end-to-end.
+- The UEFA report PDF's text extraction order doesn't always match its
+  visual reading order (a pull-quote/sidebar layout issue), so at least one
+  passage can't be captured by any contiguous chunk range.
+- One "hallucination-resistance" test question's reference answer was
+  itself subtly wrong — the corpus turned out to contain partial, not zero,
+  information — caught by double-checking a truncated search result
+  against the raw corpus.
+
 ## Troubleshooting
 
 ### `OPENAI_API_KEY is not set`
