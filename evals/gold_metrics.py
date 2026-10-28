@@ -25,9 +25,16 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from evals.gold_labels import gold_labels
+from evals.gold_labels import gold_labels as gold_labels_v1
+from evals.gold_labels_v2 import gold_labels_v2
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
+
+# A baseline's own chunk_version field (added when run_eval.py started
+# supporting CHUNK_VERSION) picks the matching gold-label set - the chunk
+# IDs in each only exist in their own collections, so using the wrong one
+# would silently score everything as a miss.
+GOLD_LABELS_BY_CHUNK_VERSION = {"v1": gold_labels_v1, "v2": gold_labels_v2}
 
 
 def latest_results_file():
@@ -79,6 +86,8 @@ def _mean(values):
 
 def compute_metrics(baseline_path):
     data = json.loads(Path(baseline_path).read_text())
+    chunk_version = data.get("chunk_version", "v1")
+    gold_labels = GOLD_LABELS_BY_CHUNK_VERSION[chunk_version]
 
     rows = []
     skipped = []
@@ -107,8 +116,10 @@ def compute_metrics(baseline_path):
 def main():
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else latest_results_file()
     rows, skipped = compute_metrics(path)
+    chunk_version = json.loads(path.read_text()).get("chunk_version", "v1")
 
     print(f"Deterministic retrieval metrics for: {path}")
+    print(f"Chunk version: {chunk_version} (gold labels: evals/gold_labels{'_v2' if chunk_version == 'v2' else ''}.py)")
     if skipped:
         print(f"Skipped (no gold label, or baseline predates chunk_id surfacing): {skipped}")
 

@@ -15,6 +15,7 @@ is deleted once a run finishes cleanly.
 """
 import asyncio
 import json
+import os
 
 from evals import _ragas_compat  # noqa: F401 - must run before importing ragas
 from datetime import datetime, timezone
@@ -35,13 +36,31 @@ from evals.judge import (
     build_judge_embeddings,
     build_judge_llm,
 )
-from app.config.rag import DEFAULT_N_RESULTS
+from app.config.rag import DEFAULT_N_RESULTS, DEFAULT_RETRIEVAL_MODE
 from app.services.rag_chain import get_rag_chain
 from evals.questions import evaluation_questions
 
 rag_chain = get_rag_chain()
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 CHECKPOINT_PATH = RESULTS_DIR / "checkpoint.json"
+
+# One variable, changed deliberately per CLAUDE.md's Retrieval Experiment
+# Discipline - "dense" (the frozen Phase 2A baseline) or "hybrid" (Phase
+# 2B). Set via env var so a Phase 2B comparison run needs no code edit:
+#   RETRIEVAL_MODE=hybrid .venv-eval/bin/python -u -m evals.run_eval
+RETRIEVAL_MODE = os.environ.get("RETRIEVAL_MODE", DEFAULT_RETRIEVAL_MODE)
+
+# "v1" (default) = the original collections the Phase 2A baseline was
+# frozen against. "v2" = the cleaned collections (clean_and_merge_chunks -
+# see EVAL_FINDINGS.md). This only repoints app.config.source's
+# collection names for this process; the v1 collections and their baseline
+# are untouched either way.
+#   CHUNK_VERSION=v2 .venv-eval/bin/python -u -m evals.run_eval
+CHUNK_VERSION = os.environ.get("CHUNK_VERSION", "v1")
+if CHUNK_VERSION == "v2":
+    from app.config import source as _source_config
+    for _cfg in _source_config.KNOWLEDGE_SOURCES.values():
+        _cfg["collection"] = _cfg["collection"] + "_v2"
 
 
 def build_evaluation_dataset():
@@ -57,6 +76,7 @@ def build_evaluation_dataset():
                 query=item["user_input"],
                 source_ids=item["source_ids"],
                 n_results=DEFAULT_N_RESULTS,
+                retrieval_mode=RETRIEVAL_MODE,
             )
         except Exception as e:
             print(f"   FAILED: {e}")
@@ -309,6 +329,8 @@ if __name__ == "__main__":
                 "judge_embedding_model": JUDGE_EMBEDDING_MODEL,
                 "generator_model": stats["model"],
                 "n_results": DEFAULT_N_RESULTS,
+                "retrieval_mode": RETRIEVAL_MODE,
+                "chunk_version": CHUNK_VERSION,
                 "aggregate": aggregate,
                 "generation_stats": stats,
                 "generation_failures": failures,

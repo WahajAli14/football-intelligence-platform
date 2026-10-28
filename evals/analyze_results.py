@@ -35,6 +35,8 @@ def main():
 
     print(f"Analyzing: {path}")
     print(f"Judge: {data['judge_model']} (temperature={data.get('judge_temperature')})")
+    print(f"Retrieval mode: {data.get('retrieval_mode', 'dense (predates retrieval_mode field)')}")
+    print(f"Chunk version: {data.get('chunk_version', 'v1 (predates chunk_version field)')}")
     print(f"Overall aggregate: {data['aggregate']}\n")
 
     by_category = defaultdict(list)
@@ -47,7 +49,7 @@ def main():
 
     for category, rows in sorted(by_category.items()):
         means = [_mean([r[m] for r in rows]) for m in METRICS]
-        values = "  ".join(f"{m:>18}" for m in means)
+        values = "  ".join(f"{'None' if m is None else m:>18}" for m in means)
         print(f"{category:<18} {len(rows):>3}  {values}")
 
 
