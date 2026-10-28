@@ -41,9 +41,30 @@ Execution Path:
    limitation on the `multi_context`/`unsupported` categories — read that
    before treating a low aggregate score as a retrieval problem.
 
-Phase 1 is complete. Do not add hybrid retrieval, reranking, memory, or
-agents (Phase 2+) without discussing it first, even though the baseline
-prerequisite is now satisfied.
+Phase 1 is complete.
+
+**Phase 2 — Retrieval Quality, in progress.** Per `PROJECT_PLAN.md`:
+
+- ✅ 2A — chunk lineage metadata, gold retrieval labels
+  (`evals/gold_labels.py`), deterministic metrics
+  (`evals/gold_metrics.py`, `evals/retrieval_eval.py`).
+- ✅ 2B — hybrid retrieval (dense + BM25, RRF) implemented, measured
+  against the gold labels, and **rejected** — underperforms dense-only on
+  every deterministic metric, on both the original and cleaned-chunking
+  collections. `DEFAULT_RETRIEVAL_MODE` stays `"dense"`. Chunking cleanup
+  (`clean_and_merge_chunks`, the `_v2` collections) is a confirmed,
+  independent win, kept regardless of the hybrid outcome. Full numbers in
+  `EVAL_FINDINGS.md`.
+- ⬜ 2C (explicit metadata filtering), 2D (reranking) — not started. Do
+  not add reranking, memory, or agents (Phase 3+) without discussing it
+  first.
+
+Before running a full `evals/run_eval.py` pass (generation + RAGAS judge,
+~19 OpenAI calls per question) while iterating on a retrieval change, use
+`evals/retrieval_eval.py` first — Recall@k/Precision@k/MRR/nDCG@k against
+the gold labels, zero OpenAI calls. Only spend a full run once a
+retrieval-only result looks genuinely promising (see EVAL_FINDINGS.md's
+quota-exhaustion entry for why this matters).
 
 ## Architecture
 

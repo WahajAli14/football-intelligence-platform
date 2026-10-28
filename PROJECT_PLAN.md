@@ -408,7 +408,7 @@ Do not treat a RAGAS-only comparison as sufficient evidence that a retrieval
 change helped — cross-check against the deterministic numbers, especially
 given the Context Precision limitation already found.
 
-### 2B - Hybrid Retrieval
+### 2B - Hybrid Retrieval - EVALUATED; DENSE RETAINED
 
 Combine:
 
@@ -424,6 +424,32 @@ and Individual Rank Learning Methods," SIGIR 2009.)
 
 Evaluate against the same final top-k as the current baseline, using both
 the deterministic metrics from 2A and RAGAS.
+
+**Result: implemented, measured, and rejected as the default.** Hybrid
+(dense + BM25, RRF k=60) underperforms dense-only on every deterministic
+metric (Recall@k, Precision@k, MRR, nDCG@k), on both the original and the
+cleaned-chunking (2A follow-up) collections. A candidate-pool diagnostic
+found real evidence BM25 surfaces that dense misses on 2 of 21 questions,
+but current fusion doesn't successfully promote it into the final top-k
+either way, while actively displacing a correct dense result on 3
+questions. Full breakdown, numbers, and the specific gains/losses in
+EVAL_FINDINGS.md's "Phase 2B: chunking cleanup confirmed, hybrid retrieval
+rejected" entry.
+
+`DEFAULT_RETRIEVAL_MODE` stays `"dense"`. The hybrid code path
+(`app/services/bm25_index.py`, `rag_service.py`'s `retrieval_mode="hybrid"`
+path) stays in the repo, flag-gated, as a documented negative result - not
+deleted, since re-deriving it would waste the diagnostic work already
+done. Weighted RRF was considered and deliberately deferred: 21
+gold-labeled questions, already repeatedly inspected by hand, with no
+held-out validation set, isn't a sound basis to tune a weight against.
+Revisit hybrid candidates together with a reranker in 2D rather than
+tuning RRF weights alone against this same question set.
+
+The chunking-cleanup work itself (`app/services/chunking.py`'s
+`clean_and_merge_chunks`, cleaned `_v2` collections, `evals/gold_labels_v2.py`)
+is a confirmed, independent win over the Phase 2A baseline on every
+deterministic metric - kept regardless of the hybrid-retrieval outcome.
 
 ### 2C - Explicit Metadata Filtering
 

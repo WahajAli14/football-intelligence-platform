@@ -1,0 +1,464 @@
+{
+  "timestamp": "2026-10-24T22:17:04.838739+00:00",
+  "judge_model": "gpt-4.1",
+  "judge_temperature": 0,
+  "judge_embedding_model": "text-embedding-3-small",
+  "generator_model": "gpt-4.1-mini",
+  "n_results": 3,
+  "retrieval_mode": "hybrid",
+  "aggregate": {
+    "faithfulness": 0.858,
+    "answer_relevancy": 0.5462,
+    "context_precision": 0.413,
+    "context_recall": 0.6348
+  },
+  "generation_stats": {
+    "total_requests": 23,
+    "total_input_tokens": 7066,
+    "total_output_tokens": 1316,
+    "total_tokens": 8382,
+    "total_cost_usd": 0.0018495,
+    "average_cost_per_request": 8.041e-05,
+    "model": "gpt-4.1-mini"
+  },
+  "generation_failures": [],
+  "per_question": [
+    {
+      "user_input": "Which team uses aggressive high pressing?",
+      "category": "football_profile",
+      "answer": "Bayern Munich uses aggressive high pressing, as they are known for aggressive pressing and high intensity without the ball, with forwards pressing defenders quickly and midfielders closing passing lanes (Bayern Munich match style).",
+      "reference": "Bayern Munich uses aggressive high pressing with high intensity without the ball, forwards pressuring defenders quickly, and midfielders closing passing lanes.",
+      "retrieved_chunk_ids": [
+        "doc_5_chunk2",
+        "doc_8_chunk2",
+        "doc_4_chunk4"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.4839825438839717,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.9999999999,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does Arsenal build up play?",
+      "category": "football_profile",
+      "answer": "Arsenal build up play through structured possession from the back, with centre-backs comfortable receiving the ball under pressure. Midfielders drop into passing lanes to help progress play, and the team creates triangles between the centre-back, full-back, and central midfielder to escape pressure. Full-backs may move into inverted positions, allowing the midfield to move forward (Arsenal tactical profile - Build-up Play).",
+      "reference": "Arsenal relies on structured possession from the back, with centre-backs comfortable under pressure, midfielders dropping into passing lanes, and full-backs moving into inverted positions.",
+      "retrieved_chunk_ids": [
+        "doc_1_chunk1",
+        "doc_1_chunk3",
+        "doc_1_chunk4"
+      ],
+      "faithfulness": 0.8333333333333334,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.9255644631472526,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.9999999999,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What are Real Madrid known for in the Champions League?",
+      "category": "football_profile",
+      "answer": "Real Madrid are known for their mentality, experience, ability to decide matches in key moments, managing pressure well, and punishing mistakes. They combine transition speed, individual quality, and European experience, making them difficult to eliminate in the Champions League (Champions League Context document).",
+      "reference": "Real Madrid are known for strong transitions, elite individual quality, fast counter-attacks, and experience in knockout Champions League matches.",
+      "retrieved_chunk_ids": [
+        "doc_2_chunk0",
+        "doc_2_chunk6",
+        "doc_2_chunk4"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.703915195708805,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.49999999995,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does Manchester City play possession football?",
+      "category": "football_profile",
+      "answer": "Manchester City plays possession football by focusing on positional play, patient buildup, and controlled possession. They use short passing combinations and form passing triangles to progress through the pitch, aiming to create numerical superiority in midfield to control territory and dictate the match's rhythm. Their midfield uses rotations, positional discipline, and overloads to open passing lanes, with the holding midfielder acting as the base of possession while advanced midfielders move between the lines to receive the ball, keeping opponents pinned back and minimizing counter-attacks (Manchester City possession style documents).",
+      "reference": "Manchester City focuses on positional play, patient buildup, short passing, overloads in midfield, and controlling territory with high defensive lines.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk0",
+        "doc_3_chunk1",
+        "doc_3_chunk2"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.989368334508686,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.5833333333041666,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What is Barcelona's possession style?",
+      "category": "football_profile",
+      "answer": "Barcelona's possession style focuses on midfield control, with midfielders receiving the ball between opposition lines, rotating positions, and creating passing angles. Ball retention is key to controlling territory and preventing the opponent from building momentum (Barcelona possession profile).",
+      "reference": "Barcelona focuses on technical midfield control, positional rotations, short passing, and creating chances through central combinations with heavy ball retention.",
+      "retrieved_chunk_ids": [
+        "doc_6_chunk0",
+        "doc_3_chunk0",
+        "doc_6_chunk2"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8691972763887583,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.3333333333,
+      "context_precision_reason": null,
+      "context_recall": 0.6,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What are PSG's attacking strengths?",
+      "category": "football_profile",
+      "answer": "PSG's attacking strengths include pace, technical quality, direct attacking actions, and quick combinations in the final third. Their wide attackers are dangerous in one-versus-one situations and can beat defenders with dribbling or acceleration. They are especially threatening when attacking before the opponent's defensive block is fully organized (PSG attacking profile - Attacking Strengths).",
+      "reference": "PSG depends on pace, technical quality, direct attacking actions, and quick combinations in the final third, with wide attackers dangerous in one-versus-one situations.",
+      "retrieved_chunk_ids": [
+        "doc_4_chunk2",
+        "doc_4_chunk5",
+        "doc_4_chunk0"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.9999996882748418,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.9999999999,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What does the UEFA report say about Arsenal's pressing?",
+      "category": "uefa_report",
+      "answer": "I don't have enough information about that based on the provided documents.",
+      "reference": "The report notes Arsenal pressed PSG high from the first minute with a compact mid-block shape, using coordinated pressing with Bukayo Saka, William Saliba, and Jurri\u00ebn Timber.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk754",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1097",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1149"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Which team had the most shots from counter-attacks in the UEFA report?",
+      "category": "uefa_report",
+      "answer": "The French side (Paris) had the most shots from counterattacks, with 31 in total (Ucl Technical-Report 2025 Digital).",
+      "reference": "Paris Saint-Germain averaged 1.8 shots from counter-attacks per game, the highest in the report.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2061",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2030",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1755"
+      ],
+      "faithfulness": 0.5,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8769336233144799,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.99999999995,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What does the UEFA report say about Liverpool's pressing strategy?",
+      "category": "uefa_report",
+      "answer": "The UEFA report states that Liverpool generally pressed all over the pitch with an aggressive defensive strategy, employing a high press that was focused and effective, as noted in their victory at Milan. Their pressing was part of a fluid and dynamic system that allowed positional manipulation to gain superiority and overload the opposition (Ucl Technical-Report 2025 Digital).",
+      "reference": "Liverpool caught the eye for their focused high press, specifically targeting Milan's left side with highly targeted pressing carried out with a clear purpose.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk416",
+        "UCL_Technical-Report_2025_DIGITAL_chunk3121",
+        "UCL_Technical-Report_2025_DIGITAL_chunk417"
+      ],
+      "faithfulness": 0.4,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.929936683611042,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.5833333333041666,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does the report describe Paris Saint-Germain's defensive fundamentals?",
+      "category": "uefa_report",
+      "answer": "I don't have enough information about Paris Saint-Germain's defensive fundamentals based on the provided documents.",
+      "reference": "The report highlights PSG's defensive mobility, ability to defend one-on-one, and excellent positioning in the box, as noted by Henning Berg after their match against Liverpool.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk57",
+        "UCL_Technical-Report_2025_DIGITAL_chunk719",
+        "UCL_Technical-Report_2025_DIGITAL_chunk720"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What did Luis Enrique say about Arsenal after the match?",
+      "category": "uefa_report",
+      "answer": "I don't have enough information about that based on the provided documents.",
+      "reference": "Luis Enrique admitted that Arsenal pressed PSG high from the first minute and they couldn't overcome it.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk255",
+        "UCL_Technical-Report_2025_DIGITAL_chunk262",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1097"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Which teams excelled in counter-pressing according to the UEFA report?",
+      "category": "uefa_report",
+      "answer": "Liverpool and Atalanta excelled with their pressing strategies, which includes counter-pressing, according to the UEFA report (Ucl Technical-Report 2025 Digital).",
+      "reference": "Manchester City led with 84% of counter-pressing actions in opposition territory, followed by Arsenal at 81%, Bayern at 80%, and Aston Villa at 78%.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2255",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2187",
+        "UCL_Technical-Report_2025_DIGITAL_chunk416"
+      ],
+      "faithfulness": 0.6666666666666666,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.925561386315873,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Compare how Arsenal and Manchester City press after losing the ball.",
+      "category": "multi_context",
+      "answer": "Both Arsenal and Manchester City employ immediate counter-pressing after losing possession to quickly win the ball back and prevent opponents from launching counter-attacks. Manchester City presses immediately with a high defensive line, requiring excellent coordination from defenders and midfielders to maintain pressure (Manchester City possession style). Arsenal's forwards press the centre-backs while midfielders block central passing lanes, aiming to force opponents wide and use the touchline as an extra defender (Arsenal tactical profile). Both teams focus on trapping opponents in their own half through high pressing and counter-pressing (High pressing explanation).",
+      "reference": "Arsenal press by pushing their forwards onto the centre-backs and using midfielders to block central passing lanes, forcing opponents wide, then react quickly to win the ball back before a counter-attack. Manchester City counter-press immediately after losing possession to stop the opponent escaping and win the ball back close to goal, relying on a high defensive line and coordination between defenders and midfielders.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk3",
+        "doc_1_chunk3",
+        "doc_8_chunk6"
+      ],
+      "faithfulness": 0.8181818181818182,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.7975114332631782,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.8333333332916666,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "According to the UEFA report, which team led in counter-pressing intensity and which team was most dangerous in transitions?",
+      "category": "multi_context",
+      "answer": "Manchester City led in counter-pressing intensity, with 84% of their counter-pressing actions taking place in the opponents\u2019 half. Paris Saint-Germain were the most consistently effective at opening up defences on transitions. (Ucl Technical-Report 2025 Digital)",
+      "reference": "Manchester City led counter-pressing intensity, with 84% of their counter-pressing actions taking place in the opposition half. Paris Saint-Germain were the most effective in transitions, averaging the most shots from counterattacks per game at 1.8.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2028",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2189",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2255"
+      ],
+      "faithfulness": 0.75,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8442966423239429,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.5,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Compare the transition and counter-attacking threat of Real Madrid and Bayern Munich.",
+      "category": "multi_context",
+      "answer": "Both Real Madrid and Bayern Munich are very dangerous in transition play, quickly attacking open spaces after winning the ball. Real Madrid's threat comes from their wide forwards running at defenders and midfielders making late runs into the box, making them especially dangerous against teams that push many players forward (Real Madrid Champions League profile). Bayern Munich's forward line is aggressive in attacking depth, exploiting spaces before opponents can recover defensively, making them difficult to defend in open space (Bayern Munich match style).",
+      "reference": "Real Madrid are one of the strongest teams in transition, with dangerous wide forwards running at defenders and midfielders making late box runs, making them especially dangerous against teams that push many players forward. Bayern Munich are also very dangerous in transition, attacking quickly after winning the ball and exploiting space before opponents recover defensively, with an aggressive forward line attacking depth.",
+      "retrieved_chunk_ids": [
+        "doc_2_chunk3",
+        "doc_2_chunk2",
+        "doc_5_chunk4"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8349960903103129,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What defensive weaknesses do Barcelona and Manchester City share?",
+      "category": "multi_context",
+      "answer": "Both Barcelona and Manchester City are vulnerable to dangerous transitions if their opponents exploit mistakes or beat their first line of pressure. Specifically, Barcelona can struggle when they lose the ball in central areas leading to dangerous transitions, while Manchester City can be vulnerable to fast counter-attacks if opponents bypass their first line of pressure (from \"Barcelona possession profile\" and \"Manchester City possession style\").",
+      "reference": "Both Barcelona and Manchester City can be exposed by fast, direct counter-attacks: Barcelona can be hurt by mistakes in central buildup leading to dangerous transitions against physical, direct teams, while Manchester City can be exposed behind their high defensive line if opponents beat their first line of pressure, especially against direct teams with fast forwards.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk5",
+        "doc_6_chunk5",
+        "doc_5_chunk5"
+      ],
+      "faithfulness": 0.6,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.818868668114806,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Compare how the general football profile explains high pressing with how Liverpool applied it against Milan in the UEFA report.",
+      "category": "cross_source",
+      "answer": "The general football profile explains high pressing as a coordinated effort where attackers apply pressure to the ball, teammates block passing options, midfielders step forward at the right time, and defenders hold a high line to keep the team compact (High pressing explanation). The UEFA report notes that Liverpool excelled with their pressing strategy but does not provide specific details on how they applied high pressing against Milan (Ucl Technical-Report 2025 Digital). Therefore, a direct comparison cannot be made based on the provided documents.",
+      "reference": "The football profile explains high pressing as coordinated pressure high up the pitch to force mistakes, while the UEFA report shows Liverpool applying it in a targeted and purposeful way against Milan.",
+      "retrieved_chunk_ids": [
+        "doc_8_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk416",
+        "doc_8_chunk0"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.5,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What similarities exist between Bayern Munich's pressing style and Arsenal's pressing against Paris?",
+      "category": "cross_source",
+      "answer": "I don't have enough information about Bayern Munich's pressing style or their pressing against Paris based on the provided documents. The Arsenal tactical profile describes Arsenal's high pressing and counter-pressing, but there is no detailed information about Bayern Munich's pressing style.",
+      "reference": "Both involve aggressive pressure, coordinated movement, players stepping forward to close options, and attempts to stop the opponent from building attacks comfortably.",
+      "retrieved_chunk_ids": [
+        "doc_5_chunk0",
+        "UCL_Technical-Report_2025_DIGITAL_chunk416",
+        "doc_1_chunk3"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.3333333333,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does Manchester City's own pressing profile relate to their counter-pressing performance in the UEFA report?",
+      "category": "cross_source",
+      "answer": "Manchester City employs immediate pressing after losing possession, known as counter-pressing, to quickly regain the ball close to goal, supported by a high defensive line requiring strong coordination (Manchester City possession style). However, the UEFA report indicates that their counter-pressing regains per 90 minutes is 1, suggesting a relatively low frequency of regaining possession through counter-pressing (Ucl Technical-Report 2025 Digital).",
+      "reference": "Manchester City's profile describes them as counter-pressing immediately after losing the ball to win it back close to goal, relying on a high defensive line and coordination between defenders and midfielders. This matches the UEFA report's finding that Manchester City led all teams with 84% of their counter-pressing actions occurring in the opposition's half.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2255",
+        "doc_3_chunk0"
+      ],
+      "faithfulness": 0.6666666666666666,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8267954755086763,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.9999999999,
+      "context_precision_reason": null,
+      "context_recall": 0.5,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does the general high-pressing explanation describe team coordination, and how was this reflected in Arsenal's pressing against PSG per the UEFA report?",
+      "category": "cross_source",
+      "answer": "The general high-pressing explanation describes team coordination as requiring attackers, midfielders, and defenders to work together: the first player pressures the ball, teammates block nearby passing options, midfielders step forward at the right time, and defenders hold a high line to keep the team compact (High pressing explanation). This was reflected in Arsenal's pressing against PSG by their forwards pressing the centre-backs while midfielders blocked central passing lanes, forcing opponents wide to use the touchline as an extra defender, and quickly reacting to win the ball back after losing possession (Arsenal tactical profile).",
+      "reference": "The general explanation describes high pressing as requiring coordination between attackers, midfielders, and defenders, with players stepping forward together and holding a compact line. This matches the UEFA report's description of Arsenal's pressing against PSG, using a compact mid-block shape with coordinated pressing from Bukayo Saka, William Saliba, and Jurri\u00ebn Timber from the first minute.",
+      "retrieved_chunk_ids": [
+        "doc_8_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk3121",
+        "doc_1_chunk3"
+      ],
+      "faithfulness": 0.5,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.735818197050552,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.8333333332916666,
+      "context_precision_reason": null,
+      "context_recall": 0.5,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What does the available knowledge base say about Inter Miami's pressing strategy?",
+      "category": "unsupported",
+      "answer": "I don't have enough information about Inter Miami's pressing strategy based on the provided documents.",
+      "reference": "The available sources do not provide enough information about Inter Miami's pressing strategy.",
+      "retrieved_chunk_ids": [
+        "doc_1_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk665",
+        "doc_6_chunk4"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What does the available knowledge base say about Chelsea's pressing strategy?",
+      "category": "unsupported",
+      "answer": "I don't have enough information about Chelsea's pressing strategy based on the provided documents.",
+      "reference": "The available sources do not provide enough information about Chelsea's pressing strategy.",
+      "retrieved_chunk_ids": [
+        "doc_1_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk416",
+        "doc_3_chunk2"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.49999999995,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "According to the UEFA report, how many goals did Erling Haaland score in the competition?",
+      "category": "partial_evidence",
+      "answer": "I don't have enough information about that based on the provided documents.",
+      "reference": "The report mentions Erling Haaland, including a goal against Sparta Praha, but it does not provide his cumulative goal tally for the competition.",
+      "retrieved_chunk_ids": [
+        "doc_7_chunk4",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1085",
+        "doc_2_chunk3"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    }
+  ]
+}

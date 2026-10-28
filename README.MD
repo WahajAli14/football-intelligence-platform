@@ -282,6 +282,21 @@ write-up, with root cause and resolution for each, is in
   itself subtly wrong — the corpus turned out to contain partial, not zero,
   information — caught by double-checking a truncated search result
   against the raw corpus.
+- 72% of the UEFA report's chunks were page numbers, headings, or image
+  captions turned into their own standalone retrievable unit by the PDF
+  extraction — fixed by merging short fragments into neighboring content
+  instead of indexing them on their own; this alone beat the frozen
+  baseline on every retrieval metric.
+- Hybrid retrieval (dense + BM25, RRF) was implemented, measured, and
+  rejected — it underperforms dense-only on every deterministic metric,
+  on both the original and the cleaned-chunking collections. Dense stays
+  the default; the hybrid code path stays in the repo as a documented
+  negative result.
+- Running the full generation+RAGAS-judge pipeline four times in a row
+  while iterating on the above burned through the project's OpenAI quota
+  mid-comparison — resolved with `evals/retrieval_eval.py`, a zero-OpenAI-
+  call way to check Recall@k/Precision@k/MRR/nDCG@k before ever spending
+  on a full run.
 
 ## Troubleshooting
 

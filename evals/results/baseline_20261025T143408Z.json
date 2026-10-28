@@ -1,0 +1,465 @@
+{
+  "timestamp": "2026-10-25T14:34:08.137869+00:00",
+  "judge_model": "gpt-4.1",
+  "judge_temperature": 0,
+  "judge_embedding_model": "text-embedding-3-small",
+  "generator_model": "gpt-4.1-mini",
+  "n_results": 3,
+  "retrieval_mode": "dense",
+  "chunk_version": "v2",
+  "aggregate": {
+    "faithfulness": 0.9625,
+    "answer_relevancy": 0.7828,
+    "context_precision": 0.8333,
+    "context_recall": 0.7
+  },
+  "generation_stats": {
+    "total_requests": 23,
+    "total_input_tokens": 8723,
+    "total_output_tokens": 1696,
+    "total_tokens": 10419,
+    "total_cost_usd": 0.00232605,
+    "average_cost_per_request": 0.00010113,
+    "model": "gpt-4.1-mini"
+  },
+  "generation_failures": [],
+  "per_question": [
+    {
+      "user_input": "Which team uses aggressive high pressing?",
+      "category": "football_profile",
+      "answer": "I don't have enough information about which team uses aggressive high pressing based on the provided documents.",
+      "reference": "Bayern Munich uses aggressive high pressing with high intensity without the ball, forwards pressuring defenders quickly, and midfielders closing passing lanes.",
+      "retrieved_chunk_ids": [
+        "doc_8_chunk1",
+        "doc_8_chunk0",
+        "doc_8_chunk2"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.0,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.0,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does Arsenal build up play?",
+      "category": "football_profile",
+      "answer": "Arsenal build up play by relying on structured possession from the back. Their centre-backs are comfortable receiving the ball under pressure, while midfielders drop into passing lanes to help progress play. They often create triangles between the centre-back, full-back, and central midfielder to escape pressure. Additionally, their full-backs may move into inverted positions, allowing the midfield to move forward (Arsenal Tactical Profile - Build-up Play).",
+      "reference": "Arsenal relies on structured possession from the back, with centre-backs comfortable under pressure, midfielders dropping into passing lanes, and full-backs moving into inverted positions.",
+      "retrieved_chunk_ids": [
+        "doc_1_chunk0",
+        "doc_1_chunk3",
+        "doc_1_chunk2"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.9255644631472526,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.9999999999,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What are Real Madrid known for in the Champions League?",
+      "category": "football_profile",
+      "answer": "Real Madrid are known for their mentality, experience, ability to decide matches in key moments, managing pressure well, and punishing mistakes in knockout ties. They are also strong in transition attacks, combining transition speed, individual quality, and European experience to be difficult to eliminate (Document 1 and Document 3).",
+      "reference": "Real Madrid are known for strong transitions, elite individual quality, fast counter-attacks, and experience in knockout Champions League matches.",
+      "retrieved_chunk_ids": [
+        "doc_2_chunk5",
+        "doc_2_chunk0",
+        "doc_2_chunk1"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.7103099126479832,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.8333333332916666,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does Manchester City play possession football?",
+      "category": "football_profile",
+      "answer": "Manchester City plays possession football through patient, positional build-up using short combinations and passing triangles to create numerical superiority in midfield, allowing them to control territory and dictate the match's rhythm. Their midfield uses rotations, positional discipline, and overloads to open passing lanes, with a holding midfielder as the base of possession and advanced midfielders moving between the lines to receive the ball. Additionally, they press immediately after losing possession to quickly regain the ball and maintain pressure (all based on the provided documents).",
+      "reference": "Manchester City focuses on positional play, patient buildup, short passing, overloads in midfield, and controlling territory with high defensive lines.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk0",
+        "doc_3_chunk1",
+        "doc_3_chunk2"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.9681056466167451,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.99999999995,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What is Barcelona's possession style?",
+      "category": "football_profile",
+      "answer": "Barcelona's possession style focuses on technical midfield control, short passing, positional rotations, and patient buildup. They progress the ball through central areas using quick combinations and intelligent movement, aiming to keep the ball and control the tempo rather than playing direct football early. Their midfielders receive between opposition lines, rotate positions, and create passing angles to maintain ball retention and territorial control (Barcelona Possession Profile documents).",
+      "reference": "Barcelona focuses on technical midfield control, positional rotations, short passing, and creating chances through central combinations with heavy ball retention.",
+      "retrieved_chunk_ids": [
+        "doc_6_chunk0",
+        "doc_6_chunk5",
+        "doc_6_chunk1"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8500089937530669,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.9999999999666667,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What are PSG's attacking strengths?",
+      "category": "football_profile",
+      "answer": "PSG's attacking strengths include pace, technical quality, direct attacking actions, quick combinations in the final third, and dangerous wide attackers who excel in one-versus-one situations with dribbling or acceleration. They are especially threatening when attacking before the opponent's defensive block is fully organized (Document 1). Additionally, PSG build attacks through technical midfielders and defenders comfortable on the ball, aiming to progress quickly into attacking areas and deliver the ball to dangerous attackers in space (Document 2).",
+      "reference": "PSG depends on pace, technical quality, direct attacking actions, and quick combinations in the final third, with wide attackers dangerous in one-versus-one situations.",
+      "retrieved_chunk_ids": [
+        "doc_4_chunk1",
+        "doc_4_chunk0",
+        "doc_4_chunk4"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.9769004988257862,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.99999999995,
+      "context_precision_reason": null,
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What does the UEFA report say about Arsenal's pressing?",
+      "category": "uefa_report",
+      "answer": "The UEFA report highlights that Arsenal applied intense high pressing, with their front players and winger Bukayo Saka leading the press from a compact mid-block shape, forcing Paris Saint-Germain backwards. Their centre-backs were also willing to step in to intercept passes through the lines. This high pressing caused problems for Paris, contributing to Arsenal's 2-0 win on Matchday 2 in London (Documents 1 and 2). However, the report also notes that pressing Paris is difficult due to their central overloads and threats in behind the back line and between the lines, which sometimes made Arsenal hesitant to push up from midfield (Document 3).",
+      "reference": "The report notes Arsenal pressed PSG high from the first minute with a compact mid-block shape, using coordinated pressing with Bukayo Saka, William Saliba, and Jurri\u00ebn Timber.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk708",
+        "UCL_Technical-Report_2025_DIGITAL_chunk707",
+        "UCL_Technical-Report_2025_DIGITAL_chunk420"
+      ],
+      "faithfulness": 0.625,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.8450527560402564,
+      "answer_relevancy_reason": null,
+      "context_precision": 0.99999999995,
+      "context_precision_reason": null,
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Which team had the most shots from counter-attacks in the UEFA report?",
+      "category": "uefa_report",
+      "answer": "Paris had the most shots from counterattacks, with 31 in total (around 10% of their 319 shots), according to the UEFA report (Ucl Technical-Report 2025 Digital).",
+      "reference": "Paris Saint-Germain averaged 1.8 shots from counter-attacks per game, the highest in the report.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk809",
+        "UCL_Technical-Report_2025_DIGITAL_chunk800",
+        "UCL_Technical-Report_2025_DIGITAL_chunk562"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": 0.986315614017923,
+      "answer_relevancy_reason": null,
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "What does the UEFA report say about Liverpool's pressing strategy?",
+      "category": "uefa_report",
+      "answer": "The UEFA report states that Liverpool generally pressed all over the pitch with an aggressive defensive strategy, and in possession they had a fluid and dynamic interchanging system allowing for positional manipulation to gain superiority while overloading the opposition (Document 1). Additionally, Liverpool excelled with their pressing strategies (Document 3).",
+      "reference": "Liverpool caught the eye for their focused high press, specifically targeting Milan's left side with highly targeted pressing carried out with a clear purpose.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk1019",
+        "UCL_Technical-Report_2025_DIGITAL_chunk315",
+        "UCL_Technical-Report_2025_DIGITAL_chunk215"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": 0.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "How does the report describe Paris Saint-Germain's defensive fundamentals?",
+      "category": "uefa_report",
+      "answer": "The report describes Paris Saint-Germain's defensive fundamentals as impressive in terms of the mobility of the defenders, their ability to defend one-on-one, and their good positioning when in the box (Ucl Technical-Report 2025 Digital, PARIS' DEFENSIVE FUNDAMENTALS).",
+      "reference": "The report highlights PSG's defensive mobility, ability to defend one-on-one, and excellent positioning in the box, as noted by Henning Berg after their match against Liverpool.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk798",
+        "UCL_Technical-Report_2025_DIGITAL_chunk314",
+        "UCL_Technical-Report_2025_DIGITAL_chunk313"
+      ],
+      "faithfulness": 1.0,
+      "faithfulness_reason": null,
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "What did Luis Enrique say about Arsenal after the match?",
+      "category": "uefa_report",
+      "answer": "Luis Enrique said that Arsenal \"pressed us high from the first minute and we couldn\u2019t overcome it\" after the match. (Ucl Technical-Report 2025 Digital)",
+      "reference": "Luis Enrique admitted that Arsenal pressed PSG high from the first minute and they couldn't overcome it.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk94",
+        "UCL_Technical-Report_2025_DIGITAL_chunk160",
+        "UCL_Technical-Report_2025_DIGITAL_chunk708"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "Which teams excelled in counter-pressing according to the UEFA report?",
+      "category": "uefa_report",
+      "answer": "According to the UEFA report, Manchester City excelled in counter-pressing with 84% of their counter-pressing actions in the opponents' half, followed by Arsenal (81%), Bayern (80%), and Aston Villa (78%) (Document 1). Additionally, Monaco had a season\u2019s highest 73 counter-pressures in a match against Benfica, and Barcelona made 72 counter-pressing actions with 16 regains in their match against Benfica (Documents 2 and 3).",
+      "reference": "Manchester City led with 84% of counter-pressing actions in opposition territory, followed by Arsenal at 81%, Bayern at 80%, and Aston Villa at 78%.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk835",
+        "UCL_Technical-Report_2025_DIGITAL_chunk860",
+        "UCL_Technical-Report_2025_DIGITAL_chunk832"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": 1.0,
+      "context_recall_reason": null
+    },
+    {
+      "user_input": "Compare how Arsenal and Manchester City press after losing the ball.",
+      "category": "multi_context",
+      "answer": "Both Arsenal and Manchester City press immediately after losing possession with the aim of quickly winning the ball back. Manchester City uses a high defensive line to maintain pressure close to their goal, requiring excellent coordination among defenders and midfielders (Manchester City possession style). Arsenal's forwards press the centre-backs while midfielders block central passing lanes, trying to force opponents wide and using the touchline as an extra defender. They also react quickly to regain possession before a counter-attack can develop (Arsenal tactical profile).",
+      "reference": "Arsenal press by pushing their forwards onto the centre-backs and using midfielders to block central passing lanes, forcing opponents wide, then react quickly to win the ball back before a counter-attack. Manchester City counter-press immediately after losing possession to stop the opponent escaping and win the ball back close to goal, relying on a high defensive line and coordination between defenders and midfielders.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk2",
+        "doc_1_chunk2",
+        "doc_6_chunk3"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "According to the UEFA report, which team led in counter-pressing intensity and which team was most dangerous in transitions?",
+      "category": "multi_context",
+      "answer": "Manchester City led in counter-pressing intensity, with 84% of their counter-pressing actions in the opponents' half. Paris Saint-Germain were the most consistently effective at opening up defenses on transitions. (Referenced from the provided Ucl Technical-Report 2025 Digital documents)",
+      "reference": "Manchester City led counter-pressing intensity, with 84% of their counter-pressing actions taking place in the opposition half. Paris Saint-Germain were the most effective in transitions, averaging the most shots from counterattacks per game at 1.8.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk797",
+        "UCL_Technical-Report_2025_DIGITAL_chunk835",
+        "UCL_Technical-Report_2025_DIGITAL_chunk861"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "Compare the transition and counter-attacking threat of Real Madrid and Bayern Munich.",
+      "category": "multi_context",
+      "answer": "Both Bayern Munich and Real Madrid are very dangerous in transition play, quickly attacking open spaces after winning the ball. Bayern focuses on exploiting spaces before the opponent recovers defensively, with an aggressive forward line attacking in depth, making them hard to defend in open space (Bayern Munich match style). Real Madrid also quickly look forward to attack open spaces, with wide forwards running at defenders and midfielders supporting with late runs into the box, making them especially dangerous against teams that push many players forward (Real Madrid Champions League profile). Additionally, Real Madrid's transition threat is enhanced by quick switches of play and individual quality in the final third, allowing them to produce goals even under pressure through fast counter-attacks and direct combinations (Real Madrid Champions League profile).",
+      "reference": "Real Madrid are one of the strongest teams in transition, with dangerous wide forwards running at defenders and midfielders making late box runs, making them especially dangerous against teams that push many players forward. Bayern Munich are also very dangerous in transition, attacking quickly after winning the ball and exploiting space before opponents recover defensively, with an aggressive forward line attacking depth.",
+      "retrieved_chunk_ids": [
+        "doc_5_chunk3",
+        "doc_2_chunk1",
+        "doc_2_chunk2"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "What defensive weaknesses do Barcelona and Manchester City share?",
+      "category": "multi_context",
+      "answer": "Both Barcelona and Manchester City are vulnerable to quick transitions or counter-attacks following a loss of possession. Barcelona can struggle if they lose the ball in central areas, leading to dangerous transitions (Barcelona possession profile). Manchester City can be vulnerable to fast counter-attacks if opponents beat their first line of pressure, exploiting space behind their high defensive line (Manchester City possession style).",
+      "reference": "Both Barcelona and Manchester City can be exposed by fast, direct counter-attacks: Barcelona can be hurt by mistakes in central buildup leading to dangerous transitions against physical, direct teams, while Manchester City can be exposed behind their high defensive line if opponents beat their first line of pressure, especially against direct teams with fast forwards.",
+      "retrieved_chunk_ids": [
+        "doc_6_chunk4",
+        "doc_3_chunk4",
+        "doc_6_chunk2"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "Compare how the general football profile explains high pressing with how Liverpool applied it against Milan in the UEFA report.",
+      "category": "cross_source",
+      "answer": "The general football profile explains high pressing as a strategy where a team tries to win the ball back close to the opponent's goal by pushing players forward to pressure defenders and goalkeepers during buildup, aiming to force mistakes in dangerous areas and create quick chances (High pressing explanation documents). Liverpool applied pressing strategies effectively, as noted in the UEFA report, where they excelled with their pressing (Ucl Technical-Report 2025 Digital). However, the UEFA report does not provide specific details on how Liverpool applied high pressing against Milan, so a direct comparison cannot be made based on the provided documents.",
+      "reference": "The football profile explains high pressing as coordinated pressure high up the pitch to force mistakes, while the UEFA report shows Liverpool applying it in a targeted and purposeful way against Milan.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk215",
+        "doc_8_chunk0",
+        "doc_8_chunk1"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "What similarities exist between Bayern Munich's pressing style and Arsenal's pressing against Paris?",
+      "category": "cross_source",
+      "answer": "Both Bayern Munich and Arsenal employ aggressive high pressing and counter-pressing, with forwards pressing defenders or centre-backs quickly and midfielders stepping forward to close passing lanes or block central passing lanes. Both teams aim to react quickly after losing possession to win the ball back before the opponent can launch an attack (Bayern Munich match style; Arsenal tactical profile).",
+      "reference": "Both involve aggressive pressure, coordinated movement, players stepping forward to close options, and attempts to stop the opponent from building attacks comfortably.",
+      "retrieved_chunk_ids": [
+        "doc_5_chunk1",
+        "doc_1_chunk2",
+        "UCL_Technical-Report_2025_DIGITAL_chunk420"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "How does Manchester City's own pressing profile relate to their counter-pressing performance in the UEFA report?",
+      "category": "cross_source",
+      "answer": "Manchester City's pressing profile involves pressing immediately after losing possession with a high defensive line to maintain pressure, which aligns with their counter-pressing performance in the UEFA report showing that 84% of their counter-pressing actions occur in the opponent's half, indicating aggressive and effective counter-pressing close to the opponent's goal (Documents: \"Manchester City possession style\" and \"Ucl Technical-Report 2025 Digital\").",
+      "reference": "Manchester City's profile describes them as counter-pressing immediately after losing the ball to win it back close to goal, relying on a high defensive line and coordination between defenders and midfielders. This matches the UEFA report's finding that Manchester City led all teams with 84% of their counter-pressing actions occurring in the opposition's half.",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk2",
+        "UCL_Technical-Report_2025_DIGITAL_chunk603",
+        "UCL_Technical-Report_2025_DIGITAL_chunk835"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "How does the general high-pressing explanation describe team coordination, and how was this reflected in Arsenal's pressing against PSG per the UEFA report?",
+      "category": "cross_source",
+      "answer": "The general high-pressing explanation describes team coordination as involving attackers, midfielders, and defenders working together: the first player pressures the ball, teammates block passing options, midfielders step forward at the right time, and defenders hold a high line to keep the team compact (High pressing explanation). In Arsenal's pressing against PSG, this coordination was reflected by forwards pressing the centre-backs, midfielders blocking central passing lanes, and the team forcing opponents wide to use the touchline as an extra defender. Additionally, Arsenal quickly reacted after losing possession to win the ball back before a counter-attack could be launched (Arsenal tactical profile).",
+      "reference": "The general explanation describes high pressing as requiring coordination between attackers, midfielders, and defenders, with players stepping forward together and holding a compact line. This matches the UEFA report's description of Arsenal's pressing against PSG, using a compact mid-block shape with coordinated pressing from Bukayo Saka, William Saliba, and Jurri\u00ebn Timber from the first minute.",
+      "retrieved_chunk_ids": [
+        "doc_8_chunk2",
+        "doc_4_chunk3",
+        "doc_1_chunk2"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "What does the available knowledge base say about Inter Miami's pressing strategy?",
+      "category": "unsupported",
+      "answer": "I don't have enough information about Inter Miami's pressing strategy based on the provided documents.",
+      "reference": "The available sources do not provide enough information about Inter Miami's pressing strategy.",
+      "retrieved_chunk_ids": [
+        "doc_7_chunk2",
+        "UCL_Technical-Report_2025_DIGITAL_chunk399",
+        "UCL_Technical-Report_2025_DIGITAL_chunk10"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "What does the available knowledge base say about Chelsea's pressing strategy?",
+      "category": "unsupported",
+      "answer": "I don't have enough information about Chelsea's pressing strategy based on the provided documents.",
+      "reference": "The available sources do not provide enough information about Chelsea's pressing strategy.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk1019",
+        "UCL_Technical-Report_2025_DIGITAL_chunk420",
+        "UCL_Technical-Report_2025_DIGITAL_chunk353"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    },
+    {
+      "user_input": "According to the UEFA report, how many goals did Erling Haaland score in the competition?",
+      "category": "partial_evidence",
+      "answer": "I don't have enough information about that based on the provided documents.",
+      "reference": "The report mentions Erling Haaland, including a goal against Sparta Praha, but it does not provide his cumulative goal tally for the competition.",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk869",
+        "UCL_Technical-Report_2025_DIGITAL_chunk506",
+        "UCL_Technical-Report_2025_DIGITAL_chunk508"
+      ],
+      "faithfulness": null,
+      "faithfulness_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "answer_relevancy": null,
+      "answer_relevancy_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_precision": null,
+      "context_precision_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+      "context_recall": null,
+      "context_recall_reason": "FAILED: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+    }
+  ]
+}

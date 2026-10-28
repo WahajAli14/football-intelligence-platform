@@ -142,6 +142,112 @@ relevant evidence at all). Rewrote the reference in `evals/questions.py` to
 describe what the corpus actually contains, and gave it its own gold label
 (`chunk810`) in `evals/gold_labels.py` rather than an empty one.
 
+## Phase 2B: chunking cleanup confirmed, hybrid retrieval rejected
+
+**What was tested**, via the zero-cost `evals/retrieval_eval.py` (Recall@k/
+Precision@k/MRR/nDCG@k against gold labels, no generation, no RAGAS judge -
+built specifically because this comparison burned real OpenAI quota the
+first time around by running the full `evals/run_eval.py` pipeline four
+times in a row - see the quota-exhaustion entry below):
+
+```text
+config              recall@k  precision@k   MRR     nDCG@k
+v1-dense (frozen)     0.5119     0.3492    0.627     0.5069
+v1-hybrid             0.3984     0.2698    0.4365    0.3761
+v2-dense              0.5833     0.4127    0.7063    0.5856
+v2-hybrid             0.5476     0.3651    0.6587    0.539
+```
+
+**Chunking cleanup (v2) is a clear, confirmed win.** `v2-dense` beats the
+frozen `v1-dense` baseline on every metric. This is independent of hybrid
+retrieval entirely - the comparison was deliberately run dense-only first
+so the two variables (chunking, retrieval mode) weren't conflated.
+
+**Hybrid retrieval (dense + BM25, RRF k=60) is rejected - it underperforms
+dense-only on both chunk versions**, not just the dirty v1 corpus. A
+candidate-pool diagnostic (checking membership in each method's own top-20
+pool *before* fusion, run on v2) explains why, precisely:
+
+- 1 question gained a correct hit at the final top-3 that dense alone
+  missed ("Which team uses aggressive high pressing?").
+- 3 questions lost recall entirely or partially under hybrid that dense
+  alone had right, including one ("Which teams excelled in counter-
+  pressing") where BM25 had *zero* evidence for that specific gold chunk
+  (absent from its own top-20 pool) - RRF still demoted a confident,
+  correct dense result in favor of something that scored moderately in
+  both rankings. This is RRF behaving exactly as designed (rewarding
+  cross-method agreement over single-method confidence), not a bug - it's
+  just the wrong behavior for this corpus/query style.
+- 2 more questions have real evidence in BM25's own top-20 pool that
+  dense's pool entirely lacks, but current fusion still fails to promote
+  either into the final top-3 anyway - useful evidence existing in the
+  combined pool and fusion successfully surfacing it are two different
+  things.
+- 6 further questions kept the same recall under both modes but shifted
+  MRR/nDCG (3 better under hybrid, 3 worse) - reordering within an
+  already-correct top-3, not a hit/miss change.
+- The remaining 11 of 21 scored questions: 3 literally identical
+  retrieved_chunk_ids, 8 different chunk IDs but identical metrics (same
+  hit count and rank position, different non-gold filler in the unused
+  slots). Collapsing all of this into "identical outcome" understates how
+  much actually changed underneath an unchanged aggregate number - the net
+  effect nets out close to a wash/slight negative, but it isn't from
+  nothing moving.
+
+**Weighted RRF (giving dense and BM25 unequal weight in the fusion sum) was
+considered and deliberately deferred** - not because of parameter-space
+size (with `k` fixed, it's really one degree of freedom: the dense:BM25
+ratio), but because there are only 21 gold-labeled questions here, already
+repeatedly inspected by hand while debugging this exact feature, and no
+held-out validation set. Tuning a weight against the only data available
+and calling the result validated would be fitting to the test set, not
+measuring anything.
+
+**Decision: Phase 2B evaluated, dense retained.** `v2-dense` is the
+default going forward. The hybrid code path stays in the repo (cleanly
+flag-gated, `RETRIEVAL_MODE=hybrid`) as a documented, evidence-backed
+negative result, not a live default. Revisit combining a wider hybrid
+candidate pool with a reranker (Phase 2D) rather than tuning RRF weights
+further on this same question set.
+
+## OpenAI quota exhaustion mid-experiment
+
+**What happened:** a `v2-hybrid` run against `evals/run_eval.py` (full
+generation + RAGAS judge) returned all `None`/zero requests - "OpenAI
+quota exceeded". Checking the *previous* run's results more carefully (not
+just the log tail) showed the same failure had already started 13 of 23
+questions into the `v2-dense` run before that - generation still worked,
+but judge scoring failed and silently fell back to `None` after
+exhausting retries. The `None`s didn't skew that run's printed aggregate
+(filtered out of the mean), but the surviving subset wasn't random - every
+`cross_source`, almost every `multi_context`, both `unsupported`, and the
+`partial_evidence` question were among the missing 13, while the easier
+`football_profile`/`uefa_report` categories mostly survived. Treating that
+aggregate as a real result (which an earlier pass through this work
+briefly did) would have been comparing a biased subset to the frozen
+baseline's full 23.
+
+**Root cause:** `evals/run_eval.py`'s full pipeline costs roughly 19 OpenAI
+calls per question (1 generation call, then several per RAGAS metric -
+`ContextPrecisionWithReference` alone calls the judge once per retrieved
+chunk, not once per question) - and it got run four times in a row
+(`v1-hybrid`, `v2-dense`, `v2-hybrid`, plus the original frozen baseline)
+while iterating on a retrieval change, burning through the account's quota
+well before the comparison was actually finished.
+
+**Resolution:** built `evals/retrieval_eval.py` - Recall@k/Precision@k/
+MRR/nDCG@k against gold labels with zero OpenAI calls at all (this
+project's ChromaDB collections use Chroma's own local default embedding
+model, not an OpenAI one, and BM25 is already local). Use it while
+iterating on any retrieval change; only run the full `evals/run_eval.py`
+once a retrieval-only result looks genuinely promising enough to justify
+checking answer quality too.
+
+A separate bug found while diagnosing this: `evals/analyze_results.py`'s
+per-category breakdown crashed (`TypeError`) whenever an entire category's
+mean came back `None` (exactly what the partial-failure `v2-dense` run
+triggered) - fixed to print `None` instead of crashing.
+
 ## Building gold retrieval labels from retrieval output would be circular
 
 **Risk avoided:** if "relevant chunk" labels are built by looking at what

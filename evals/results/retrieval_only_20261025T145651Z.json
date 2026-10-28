@@ -1,0 +1,336 @@
+{
+  "retrieval_mode": "dense",
+  "chunk_version": "v1",
+  "n_results": 3,
+  "aggregate": {
+    "recall_at_k": 0.5119,
+    "precision_at_k": 0.3492,
+    "mrr": 0.627,
+    "ndcg_at_k": 0.5069
+  },
+  "retrieval_failures": [],
+  "per_question": [
+    {
+      "user_input": "Which team uses aggressive high pressing?",
+      "category": "football_profile",
+      "retrieved_chunk_ids": [
+        "doc_8_chunk2",
+        "doc_8_chunk1",
+        "doc_8_chunk3"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_k": 0.0
+    },
+    {
+      "user_input": "How does Arsenal build up play?",
+      "category": "football_profile",
+      "retrieved_chunk_ids": [
+        "doc_1_chunk1",
+        "doc_1_chunk4",
+        "doc_1_chunk3"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 0.6131471927654584
+    },
+    {
+      "user_input": "What are Real Madrid known for in the Champions League?",
+      "category": "football_profile",
+      "retrieved_chunk_ids": [
+        "doc_2_chunk0",
+        "doc_2_chunk6",
+        "doc_2_chunk1"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.3333333333333333,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_k": 0.2960819109658652
+    },
+    {
+      "user_input": "How does Manchester City play possession football?",
+      "category": "football_profile",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk0",
+        "doc_3_chunk1",
+        "doc_3_chunk2"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.6666666666666666,
+      "precision_at_k": 0.6666666666666666,
+      "mrr": 0.5,
+      "ndcg_at_k": 0.5307212739772434
+    },
+    {
+      "user_input": "What is Barcelona's possession style?",
+      "category": "football_profile",
+      "retrieved_chunk_ids": [
+        "doc_6_chunk0",
+        "doc_6_chunk6",
+        "doc_6_chunk2"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.3333333333333333,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 0.3333333333333333,
+      "ndcg_at_k": 0.23463936301137822
+    },
+    {
+      "user_input": "What are PSG's attacking strengths?",
+      "category": "football_profile",
+      "retrieved_chunk_ids": [
+        "doc_4_chunk2",
+        "doc_4_chunk1",
+        "doc_4_chunk5"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "user_input": "What does the UEFA report say about Arsenal's pressing?",
+      "category": "uefa_report",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk1731",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1730",
+        "UCL_Technical-Report_2025_DIGITAL_chunk694"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 0.6131471927654584
+    },
+    {
+      "user_input": "Which team had the most shots from counter-attacks in the UEFA report?",
+      "category": "uefa_report",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2061",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2031",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1088"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_k": 0.0
+    },
+    {
+      "user_input": "What does the UEFA report say about Liverpool's pressing strategy?",
+      "category": "uefa_report",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk3121",
+        "UCL_Technical-Report_2025_DIGITAL_chunk551",
+        "UCL_Technical-Report_2025_DIGITAL_chunk416"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_k": 0.0
+    },
+    {
+      "user_input": "How does the report describe Paris Saint-Germain's defensive fundamentals?",
+      "category": "uefa_report",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2029",
+        "UCL_Technical-Report_2025_DIGITAL_chunk550",
+        "UCL_Technical-Report_2025_DIGITAL_chunk549"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_k": 0.38685280723454163
+    },
+    {
+      "user_input": "What did Luis Enrique say about Arsenal after the match?",
+      "category": "uefa_report",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk265",
+        "UCL_Technical-Report_2025_DIGITAL_chunk343",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1731"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 0.3333333333333333,
+      "ndcg_at_k": 0.5
+    },
+    {
+      "user_input": "Which teams excelled in counter-pressing according to the UEFA report?",
+      "category": "uefa_report",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2189",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2364",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2185"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "user_input": "Compare how Arsenal and Manchester City press after losing the ball.",
+      "category": "multi_context",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk3",
+        "doc_1_chunk3",
+        "doc_6_chunk4"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "user_input": "According to the UEFA report, which team led in counter-pressing intensity and which team was most dangerous in transitions?",
+      "category": "multi_context",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2028",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2189",
+        "UCL_Technical-Report_2025_DIGITAL_chunk2365"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_k": 0.38685280723454163
+    },
+    {
+      "user_input": "Compare the transition and counter-attacking threat of Real Madrid and Bayern Munich.",
+      "category": "multi_context",
+      "retrieved_chunk_ids": [
+        "doc_5_chunk4",
+        "doc_2_chunk2",
+        "doc_2_chunk3"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "user_input": "What defensive weaknesses do Barcelona and Manchester City share?",
+      "category": "multi_context",
+      "retrieved_chunk_ids": [
+        "doc_6_chunk5",
+        "doc_3_chunk5",
+        "doc_6_chunk3"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "user_input": "Compare how the general football profile explains high pressing with how Liverpool applied it against Milan in the UEFA report.",
+      "category": "cross_source",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk416",
+        "doc_8_chunk1",
+        "doc_8_chunk2"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.25,
+      "precision_at_k": 0.6666666666666666,
+      "mrr": 0.5,
+      "ndcg_at_k": 0.5307212739772434
+    },
+    {
+      "user_input": "What similarities exist between Bayern Munich's pressing style and Arsenal's pressing against Paris?",
+      "category": "cross_source",
+      "retrieved_chunk_ids": [
+        "doc_5_chunk2",
+        "doc_1_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk694"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.3333333333333333,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 0.46927872602275644
+    },
+    {
+      "user_input": "How does Manchester City's own pressing profile relate to their counter-pressing performance in the UEFA report?",
+      "category": "cross_source",
+      "retrieved_chunk_ids": [
+        "doc_3_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1296",
+        "doc_3_chunk1"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 0.6131471927654584
+    },
+    {
+      "user_input": "How does the general high-pressing explanation describe team coordination, and how was this reflected in Arsenal's pressing against PSG per the UEFA report?",
+      "category": "cross_source",
+      "retrieved_chunk_ids": [
+        "doc_8_chunk3",
+        "doc_4_chunk4",
+        "doc_1_chunk3"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.3333333333333333,
+      "precision_at_k": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_k": 0.46927872602275644
+    },
+    {
+      "user_input": "What does the available knowledge base say about Inter Miami's pressing strategy?",
+      "category": "unsupported",
+      "retrieved_chunk_ids": [
+        "doc_7_chunk3",
+        "UCL_Technical-Report_2025_DIGITAL_chunk665",
+        "UCL_Technical-Report_2025_DIGITAL_chunk664"
+      ],
+      "gold_is_empty": true,
+      "recall_at_k": null,
+      "precision_at_k": null,
+      "mrr": null,
+      "ndcg_at_k": null
+    },
+    {
+      "user_input": "What does the available knowledge base say about Chelsea's pressing strategy?",
+      "category": "unsupported",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk3121",
+        "UCL_Technical-Report_2025_DIGITAL_chunk694",
+        "UCL_Technical-Report_2025_DIGITAL_chunk606"
+      ],
+      "gold_is_empty": true,
+      "recall_at_k": null,
+      "precision_at_k": null,
+      "mrr": null,
+      "ndcg_at_k": null
+    },
+    {
+      "user_input": "According to the UEFA report, how many goals did Erling Haaland score in the competition?",
+      "category": "partial_evidence",
+      "retrieved_chunk_ids": [
+        "UCL_Technical-Report_2025_DIGITAL_chunk2376",
+        "UCL_Technical-Report_2025_DIGITAL_chunk938",
+        "UCL_Technical-Report_2025_DIGITAL_chunk1085"
+      ],
+      "gold_is_empty": false,
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_k": 0.0
+    }
+  ]
+}
