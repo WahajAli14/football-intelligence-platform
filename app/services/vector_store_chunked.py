@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional
 
 from app.config.rag import INDEX_VERSION
 from app.db.chroma_client import get_chroma_client, get_or_create_collection
-from app.services.chunking import DocumentChunker
+from app.services.chunking import DocumentChunker, clean_and_merge_chunks
 from app.services.rag_service import retrieve_similar_documents
 from app.services.document_loader import DocumentLoader
 
@@ -47,7 +47,8 @@ def add_documents_with_chunking(
     chunk_overlap: int = 50,
     strategy: str = "paragraph",
     recreate: bool = False,
-    verbose: bool = True
+    verbose: bool = True,
+    clean_chunks: bool = False,
 ) -> Dict[str, Any]:
     """
     Add documents to a ChromaDB collection with chunking.
@@ -60,6 +61,13 @@ def add_documents_with_chunking(
         strategy: Chunking strategy ("fixed", "paragraph", or "semantic").
         recreate: If True, recreate the collection (delete existing).
         verbose: If True, print progress messages.
+        clean_chunks: If True, run clean_and_merge_chunks() after chunking -
+            drops page-number/repeated-header artifacts and merges short
+            fragments into their neighbor instead of indexing them as their
+            own chunk. Off by default so existing collections/scripts are
+            unaffected - new, cleaned collections opt in explicitly (see
+            scripts/ingest_pdf.py's and ingest_football_profiles.py's `v2`
+            variants) so the originals stay reproducible for comparison.
 
     Returns:
         Dictionary with the number of chunks added and any errors encountered.
@@ -107,6 +115,11 @@ def add_documents_with_chunking(
     
     chunker = DocumentChunker(chunk_size=chunk_size, overlap=chunk_overlap, strategy=strategy)
     chunked_docs = chunker.chunk_documents(documents)
+    if clean_chunks:
+        before = len(chunked_docs)
+        chunked_docs = clean_and_merge_chunks(chunked_docs)
+        if verbose:
+            print(f"🧹 Cleaned/merged chunks: {before} -> {len(chunked_docs)}")
 
     if not chunked_docs:
         if verbose:
@@ -152,6 +165,7 @@ def add_documents_with_chunking(
             "chunk_overlap": chunk_overlap,
             "ingested_at": ingested_at,
             "index_version": INDEX_VERSION,
+            "chunk_cleaned": clean_chunks,
         })
         ids.append(doc["id"])
         texts.append(doc["text"])

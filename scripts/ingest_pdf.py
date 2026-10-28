@@ -13,7 +13,11 @@ from app.config.rag import (
 PDF_PATH = "data/raw/pdfs/UCL_Technical-Report_2025_DIGITAL.pdf"
 COLLECTION_NAME = "ucl_technical_report_2025"
 
-def ingest_pdf(file_path: str=PDF_PATH, collection_name: str=COLLECTION_NAME) -> Dict[str, Any]:
+def ingest_pdf(
+    file_path: str = PDF_PATH,
+    collection_name: str = COLLECTION_NAME,
+    clean_chunks: bool = False,
+) -> Dict[str, Any]:
     """
     Load, chunk and store pdf in chroma
     """
@@ -38,14 +42,20 @@ def ingest_pdf(file_path: str=PDF_PATH, collection_name: str=COLLECTION_NAME) ->
         DEFAULT_CHUNK_OVERLAP,
         DEFAULT_CHUNK_STRATEGY,
         recreate=True,
-        verbose=True
+        verbose=True,
+        clean_chunks=clean_chunks,
     )
 
     return result
 
 
 if __name__ == "__main__":
-    stats = ingest_pdf()
+    import sys
+    v2 = "--v2" in sys.argv
+    stats = ingest_pdf(
+        collection_name=COLLECTION_NAME + "_v2" if v2 else COLLECTION_NAME,
+        clean_chunks=v2,
+    )
 
     print("\n✅ PDF ingestion complete")
     print(f"   Collection: {stats['collection']}")

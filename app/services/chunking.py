@@ -1,10 +1,17 @@
 """Document Chunking Service - Split documents into smaller, meaningful chunks for processing and analysis."""
 
 import re
+from collections import Counter
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
-__all__ = ["ChunkingService", "Chunk"]
+__all__ = ["DocumentChunker", "Chunk", "clean_and_merge_chunks"]
+
+_WORD_RE = re.compile(r"\w+")
+_STANDALONE_NUMBER_RE = re.compile(r"\s*\d+\s*")
+DEFAULT_MIN_MERGE_TOKENS = 8
+DEFAULT_REPEAT_THRESHOLD = 3
+MAX_BOILERPLATE_TOKENS = 6
 
 
 @dataclass
@@ -255,7 +262,118 @@ class DocumentChunker:
                 )
 
         return all_chunks
-    
+
+
+def _token_count(text: str) -> int:
+    return len(_WORD_RE.findall(text))
+
+
+def _is_standalone_number(text: str) -> bool:
+    return bool(_STANDALONE_NUMBER_RE.fullmatch(text))
+
+
+def clean_and_merge_chunks(
+    chunk_dicts: List[Dict[str, Any]],
+    min_tokens: int = DEFAULT_MIN_MERGE_TOKENS,
+    repeat_threshold: int = DEFAULT_REPEAT_THRESHOLD,
+) -> List[Dict[str, Any]]:
+    """
+    Post-process chunk_documents()'s output to remove extraction artifacts
+    (standalone page numbers, repeated headers/footers) and merge remaining
+    short fragments (headings, captions) into the content next to them,
+    rather than leaving them as standalone retrievable units.
+
+    Returns new chunk dictionaries without modifying the input chunks.
+    Merging changes boundaries and IDs, preserves parent_id, and can exceed
+    the original chunk_size. Use matching gold labels for cleaned chunks.
+    This is intended for paragraph/PDF fragments; overlapping chunks from
+    other strategies can repeat text when joined because no overlap is removed.
+
+    Found necessary because PDF text extraction turns every page number,
+    heading, and image caption into its own "paragraph" purely because it's
+    visually isolated by blank lines - in the UEFA report corpus, 72% of
+    chunks ended up with 5 or fewer content tokens before this ran. BM25 is
+    especially vulnerable to this (a 1-word chunk that matches a query term
+    gets the maximum possible term-density score, beating a real paragraph
+    that mentions the same term once), but it's bad for dense retrieval too
+    - a one-word chunk can only ever add noise. See EVAL_FINDINGS.md.
+
+    min_tokens is a MERGE TRIGGER, not a deletion rule: a short-but-real
+    sentence ("Arsenal recorded 14 high turnovers") gets merged with its
+    neighbor, never dropped, because merging can only add surrounding
+    context, not lose the sentence itself. Only two things are ever
+    actually discarded:
+      - a chunk that is nothing but a number (a lone page number)
+      - a chunk whose exact text repeats >= repeat_threshold times across
+        the whole corpus AND is short (<= 6 tokens) - running headers/
+        footers/section banners, not real content occurring coincidentally.
+    """
+    if min_tokens <= 0:
+        raise ValueError("min_tokens must be positive")
+    if repeat_threshold < 2:
+        raise ValueError("repeat_threshold must be at least 2")
+
+    # Treat standalone numeric chunks as page-number artifacts.
+    chunk_dicts = [c for c in chunk_dicts if not _is_standalone_number(c["text"])]
+
+    # Repeated short boilerplate (e.g. a running section header appearing
+    # on every page) - identified by exact repetition, not length alone,
+    # so a short sentence that's merely similar to another isn't caught.
+    normalized = [c["text"].strip().lower() for c in chunk_dicts]
+    counts = Counter(normalized)
+    chunk_dicts = [
+        c for c, norm in zip(chunk_dicts, normalized)
+        if not (
+            _token_count(c["text"]) <= MAX_BOILERPLATE_TOKENS
+            and counts[norm] >= repeat_threshold
+        )
+    ]
+
+    by_parent: Dict[str, List[Dict[str, Any]]] = {}
+    for c in chunk_dicts:
+        by_parent.setdefault(c["parent_id"], []).append(c)
+
+    merged_docs = []
+    for parent_id, doc_chunks in by_parent.items():
+        doc_chunks.sort(key=lambda c: c["chunk_index"])
+        merged = []
+        buffer_texts: List[str] = []
+        buffer_start = None
+
+        for c in doc_chunks:
+            if buffer_start is None:
+                buffer_start = c["char_start"]
+            buffer_texts.append(c["text"])
+
+            if _token_count("\n".join(buffer_texts)) >= min_tokens:
+                merged.append({
+                    **c,
+                    "text": "\n".join(buffer_texts),
+                    "char_start": buffer_start,
+                    "char_end": c["char_end"],
+                })
+                buffer_texts = []
+                buffer_start = None
+
+        if buffer_texts:
+            # Never reached min_tokens before the document ended - attach to
+            # the last real merged chunk rather than dropping it; if this is
+            # the only content in the whole document, keep it as-is.
+            leftover_text = "\n".join(buffer_texts)
+            if merged:
+                merged[-1]["text"] = merged[-1]["text"] + "\n" + leftover_text
+                merged[-1]["char_end"] = doc_chunks[-1]["char_end"]
+            else:
+                merged.append({**doc_chunks[-1], "text": leftover_text, "char_start": buffer_start})
+
+        for i, c in enumerate(merged):
+            c["chunk_index"] = i
+            c["id"] = f"{parent_id}_chunk{i}"
+
+        merged_docs.extend(merged)
+
+    return merged_docs
+
 
 if __name__ == "__main__":
     sample_text = """

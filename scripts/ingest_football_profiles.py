@@ -10,7 +10,10 @@ from app.config.rag import (
 )
 
 
-def ingest_football_profiles(collection_name: str = DEFAULT_COLLECTION) -> Dict[str, Any]:
+def ingest_football_profiles(
+    collection_name: str = DEFAULT_COLLECTION,
+    clean_chunks: bool = False,
+) -> Dict[str, Any]:
     """
     Load, chunk and store the built-in football team profiles in Chroma.
     """
@@ -29,13 +32,19 @@ def ingest_football_profiles(collection_name: str = DEFAULT_COLLECTION) -> Dict[
         DEFAULT_CHUNK_STRATEGY,
         recreate=True,
         verbose=True,
+        clean_chunks=clean_chunks,
     )
 
     return result
 
 
 if __name__ == "__main__":
-    stats = ingest_football_profiles()
+    import sys
+    v2 = "--v2" in sys.argv
+    stats = ingest_football_profiles(
+        collection_name=DEFAULT_COLLECTION + "_v2" if v2 else DEFAULT_COLLECTION,
+        clean_chunks=v2,
+    )
 
     print("\n✅ Football profiles ingestion complete")
     print(f"   Collection: {stats['collection']}")
