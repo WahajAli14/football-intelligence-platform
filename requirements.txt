@@ -6,3 +6,5 @@ openai==3.3.0
 pypdf>=6.12.2
 unstructured[pdf]>=0.24.0
 pdfminer.six>=20250506
+rank_bm25==0.2.2
+snowballstemmer==3.1.1

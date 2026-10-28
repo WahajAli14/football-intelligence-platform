@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+from app.config.rag import DEFAULT_RETRIEVAL_MODE
 from app.services.llm_service import get_llm_service
 from app.services.rag_service import retrieve_similar_documents, search_accross_sources
 
@@ -10,32 +11,37 @@ class RAGChain:
     """
 
 
-    def __init__(self, n_results: int = 3):
+    def __init__(self, n_results: int = 3, retrieval_mode: str = DEFAULT_RETRIEVAL_MODE):
         self.n_results = n_results
+        self.retrieval_mode = retrieval_mode
         self.llm_service = get_llm_service()
-    
+
     def retrieve(
         self,
         query: str,
         source_ids: List[str] = None,
         n_results: int = None,
+        retrieval_mode: str = None,
     ) -> List[Dict[str, Any]]:
         """
         Retrieve relevant documents from one or more sources.
         """
 
         n = n_results if n_results else self.n_results
+        mode = retrieval_mode if retrieval_mode else self.retrieval_mode
 
         if source_ids:
             return search_accross_sources(
                 query=query,
                 source_ids=source_ids,
                 n_results=n,
+                retrieval_mode=mode,
             )
 
         return retrieve_similar_documents(
             query=query,
             n_results=n,
+            retrieval_mode=mode,
         )
 
     def generate(self, query: str, retrieved_docs: List[Dict[str, Any]]) -> str:
@@ -49,19 +55,29 @@ class RAGChain:
         """
         return self.llm_service.generate_answer(query, retrieved_docs)
     
-    def ask(self, query: str, source_ids: List[str] = None, n_results: int = None) -> Dict[str, Any]:
+    def ask(
+        self,
+        query: str,
+        source_ids: List[str] = None,
+        n_results: int = None,
+        retrieval_mode: str = None,
+    ) -> Dict[str, Any]:
         """
         Complete RAG pipeline: Retrieve → Generate.
-        
+
         Args:
             query: User's question
             source_ids: List of source IDs to search across (optional)
             n_results: Number of documents to retrieve
-        
+            retrieval_mode: "dense" or "hybrid" (defaults to the chain's
+                own retrieval_mode if not given - see RAGChain.__init__)
+
         Returns:
             Dictionary with query, answer, and retrieved documents
         """
-        retrieved_docs = self.retrieve(query, source_ids=source_ids, n_results=n_results)
+        retrieved_docs = self.retrieve(
+            query, source_ids=source_ids, n_results=n_results, retrieval_mode=retrieval_mode
+        )
 
         if not retrieved_docs:
             return {
