@@ -260,3 +260,78 @@ other for the wrong reason.
 then found supporting chunks by searching the raw text for the specific
 facts each reference cites. Gold labels were built with zero dependency on
 what the retriever happens to rank highly.
+
+## Phase 2C scope narrowed to what the corpus actually supports
+
+The original Phase 2C plan listed six filterable dimensions: source,
+document, team, competition, season, page/section. Source-level filtering
+already existed (`source_ids`). Of the rest, only `document_ids` turned out
+to have real data behind it:
+
+- **football_profiles** is 8 separate documents (one per team) - filtering
+  by document is meaningful here, and this is where the one demonstrated
+  win came from (below).
+- **ucl_technical_report_2025** is a single ingested PDF - one `doc_id`,
+  one `parent_id` shared by every chunk in the whole collection. Filtering
+  by `document_ids` here would return the entire collection unfiltered;
+  there's nothing to narrow down to until more reports/PDFs are ingested,
+  or the single report is deliberately split into multiple logical
+  sub-documents at ingestion.
+- **team** metadata would be redundant with `document_ids` today, since
+  football_profiles is already one document per team - `team="Arsenal"`
+  and `document_ids=["<arsenal_doc_id>"]` behave identically. Deferred
+  until a team has multiple documents, or team evidence starts spanning
+  documents/sources.
+- **competition, season, page/section** aren't present in this corpus at
+  all (one competition, one season) - deferred indefinitely rather than
+  manufacturing metadata dimensions the data doesn't support.
+
+**2C-v1 (`document_ids`, dense-only) - demonstrated value case.** Of 6
+single-document football_profile questions tested with and without the
+filter, 5 showed zero difference (dense retrieval already found the right
+chunk without help). One showed a real rescue: *"Which team uses aggressive
+high pressing?"* doesn't name Bayern, so unscoped dense pulled a generic
+"High Pressing Explanation" doc from a different source (recall 0.0, wrong
+document entirely). Scoped to `document_ids=["doc_5"]` (Bayern's profile),
+recall/MRR/nDCG all went to 1.0. This is the actual value proposition of
+explicit filtering: it does nothing when retrieval is already right, and
+fully rescues cases where the query itself is too generic for embeddings
+to find the right document unaided - it is a caller-provided hint, not a
+retrieval-quality technique like hybrid search or reranking, and the
+caller (UI, conversation state, access control) is expected to supply it,
+never the retrieval layer guessing it from the query text.
+
+## 2D-1 experiment spec locked before implementation
+
+Phase 2B's hybrid retrieval fused dense and BM25 via RRF down to a final
+top-k *before* anything else could see the full candidate set - exactly
+the step that underperformed. 2D must not repeat that mistake under a
+different name: reranking the RRF-fused top-k would just be reranking an
+already-pruned, already-wrong pool.
+
+2D-1 instead reranks the **deduplicated union** of dense top-N and BM25
+top-N (reusing `_dense_search_multi`/`_bm25_search_multi` from 2B
+directly - no new retrieval primitives needed, only a different
+combination step in place of `_rrf_fuse`):
+
+```text
+dense top-10  -\
+                 >- union, dedupe by chunk_id -> cross-encoder rerank -> top-3
+BM25 top-10   -/
+```
+
+Locked before running, not tuned mid-experiment:
+
+- `candidate_pool_per_retriever = 10`, `final_k = 3`
+- reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`
+  (sentence-transformers, local, zero API cost) - the *initial* locked
+  choice for 2D-1, not necessarily the final production reranker; a
+  negative result means this reranker/pipeline didn't help, not that
+  reranking as a technique is useless
+- an additional diagnostic 2B's analysis had to reconstruct after the
+  fact: record candidate recall over the deduplicated union *before*
+  reranking, separately from Recall@3/Precision@3/MRR/nDCG@3 on the final
+  top-3. This distinguishes a reranker failure (gold chunk was in the
+  union, reranker didn't surface it) from a candidate-generation failure
+  (gold chunk was never in the union) from the start, rather than
+  diagnosing it after the fact the way 2B's candidate-pool analysis did.

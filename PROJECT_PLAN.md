@@ -451,46 +451,76 @@ The chunking-cleanup work itself (`app/services/chunking.py`'s
 is a confirmed, independent win over the Phase 2A baseline on every
 deterministic metric - kept regardless of the hybrid-retrieval outcome.
 
-### 2C - Explicit Metadata Filtering
-
-Support filtering by:
-
-- source
-- document
-- team
-- competition
-- season
-- page or section where available
+### 2C - Explicit Metadata Filtering - SCOPE NARROWED; 2C-v1 IMPLEMENTED
 
 Filtering must be explicit and caller-visible — applied only when the
-query/caller actually specifies a scope (e.g. "use only the UEFA report"),
-never silently inferred by the system. An incorrectly inferred restrictive
-filter can drop recall to zero for evidence that exists in an excluded
-source.
+caller actually specifies a scope, never silently inferred by the system.
+An incorrectly inferred restrictive filter can drop recall to zero for
+evidence that exists in an excluded source. (Source-level filtering already
+existed before 2C, via `source_ids`.)
 
-Evaluate filtering as its own experiment, separate from hybrid retrieval. It
-is primarily a scoping/precision feature for already-scoped queries, not
-expected to be the main fix for the recall/ranking issues found in Phase 1 —
-but don't assume that without checking; it may still give targeted
-precision gains on queries that already name a team, competition, or
-source.
+Of the originally listed dimensions (source, document, team, competition,
+season, page/section), only two are actually supported by this corpus
+today:
+
+- **2C-v1 - `document_ids` (dense-only). Implemented, pending retrieval-only
+  validation close-out.** Explicit `document_ids` on `SearchRequest`,
+  threaded through `/search`, `/ask`, `RAGChain`, and
+  `search_accross_sources`/`retrieve_similar_documents`, filtering via
+  Chroma's `where={"parent_id": {"$in": [...]}}`. `document_ids` combined
+  with `retrieval_mode="hybrid"` raises `ValueError` rather than silently
+  ignoring the filter. No `document_ids` means no filtering - identical to
+  pre-2C behavior. Validation: no-filter parity with the dense baseline,
+  correct-filter chunks all belong to the requested parent_id(s), a
+  wrong/nonexistent ID returns zero results with no leakage, and a
+  multi-ID list unions correctly — all computable with the existing gold
+  labels and zero OpenAI calls, no full RAGAS run needed since filtering is
+  deterministic (it either returns chunks from the specified documents or
+  it does not).
+- **2C-v2 - `team` metadata (deferred, no current use case).**
+  `football_profiles` is already one document per team, so
+  `team="Arsenal"` and `document_ids=["<arsenal_doc_id>"]` would behave
+  identically today. Revisit only if a team gets multiple documents (e.g.
+  several reports), or team evidence starts spanning multiple documents or
+  sources.
+- **competition, season, page/section - deferred indefinitely.** The
+  corpus is one UEFA report (one season, one competition) and one
+  document per football profile - these dimensions aren't present in the
+  data to filter on; adding them now would be manufacturing metadata the
+  corpus doesn't support, not a real feature.
 
 ### 2D - Reranking
 
-Retrieve a wider candidate pool (from 2B's hybrid retrieval) and rerank
-before generation, keeping the final context count fixed so the comparison
-to baseline stays apples-to-apples.
-
-Target flow:
+Retrieve a wider candidate pool and rerank before generation, keeping the
+final context count fixed so the comparison to baseline stays
+apples-to-apples. The 2B lesson matters here: RRF already *fuses* dense and
+BM25 down to a final top-k before anything else sees it, which is exactly
+what underperformed. 2D must rerank the **deduplicated union** of dense
+top-N and BM25 top-N (reusing `_dense_search_multi`/`_bm25_search_multi`
+from 2B as-is), not the RRF-fused top-k - a different pipeline from 2B, not
+a re-run of it:
 
 ```text
 Query
- -> dense + lexical retrieval
- -> candidate pool
- -> reranker
- -> final contexts
- -> LLM
+ -> dense top-N (N=10)  -\
+                           >- union, dedupe by chunk_id -> reranker -> top-3
+ -> BM25 top-N (N=10)   -/
 ```
+
+**2D-1 locked experiment spec** (fix before running, do not tune mid-run):
+
+- `candidate_pool_per_retriever = 10`, `final_k = 3`
+- reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2` (sentence-transformers,
+  local, zero API cost) - this is the *initial* locked reranker for 2D-1,
+  not necessarily the final production choice; a negative result means
+  this reranker/pipeline didn't help, not that reranking as a technique is
+  useless
+- record candidate recall over the deduplicated union *before* reranking,
+  in addition to the usual Recall@3/Precision@3/MRR/nDCG@3 on the final
+  top-3. This separates reranker failure (gold chunk was in the union, but
+  the reranker didn't surface it) from candidate-generation failure (gold
+  chunk was never in the union to begin with) - a distinction 2B's
+  diagnostics didn't have and had to reconstruct after the fact.
 
 nDCG@k becomes the most informative deterministic metric at this stage,
 since reranking is fundamentally an ordering problem.

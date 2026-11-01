@@ -297,6 +297,12 @@ write-up, with root cause and resolution for each, is in
   mid-comparison — resolved with `evals/retrieval_eval.py`, a zero-OpenAI-
   call way to check Recall@k/Precision@k/MRR/nDCG@k before ever spending
   on a full run.
+- Of the six metadata-filtering dimensions originally planned for Phase
+  2C, only explicit `document_ids` had real data behind it — the UEFA
+  report is a single ingested document, and team/competition/season
+  aren't present in this corpus to filter on. `document_ids` filtering
+  (dense-only) is implemented and rescues a real failure case: a query
+  too generic for embeddings to find the right document unaided.
 
 ## Troubleshooting
 

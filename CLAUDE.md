@@ -55,9 +55,21 @@ Phase 1 is complete.
   (`clean_and_merge_chunks`, the `_v2` collections) is a confirmed,
   independent win, kept regardless of the hybrid outcome. Full numbers in
   `EVAL_FINDINGS.md`.
-- ⬜ 2C (explicit metadata filtering), 2D (reranking) — not started. Do
-  not add reranking, memory, or agents (Phase 3+) without discussing it
-  first.
+- 🔶 2C — scope narrowed to what the corpus actually supports (see
+  `PROJECT_PLAN.md`): **2C-v1** (explicit `document_ids`, dense-only,
+  via Chroma's `where={"parent_id": {"$in": [...]}}`) is implemented
+  (`app/models/request/search.py`, `app/api/routes.py`,
+  `app/services/rag_chain.py`, `app/services/rag_service.py`), pending
+  a retrieval-only validation close-out — no full RAGAS run needed,
+  filtering is deterministic. **2C-v2** (`team` metadata) is deferred —
+  `football_profiles` is already one document per team, so it adds
+  nothing yet. Competition/season/page/section filtering is deferred
+  indefinitely — not present in this corpus to filter on.
+- ⬜ 2D (reranking) — not started, spec locked in `PROJECT_PLAN.md`
+  (rerank the deduped union of dense-top-10 and BM25-top-10, not the
+  RRF-fused top-k; reranker `cross-encoder/ms-marco-MiniLM-L-6-v2`,
+  final_k=3, both fixed before running). Do not add memory or agents
+  (Phase 3+) without discussing it first.
 
 Before running a full `evals/run_eval.py` pass (generation + RAGAS judge,
 ~19 OpenAI calls per question) while iterating on a retrieval change, use
