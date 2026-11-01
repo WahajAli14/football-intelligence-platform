@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.config.source import SourceID
@@ -9,9 +11,9 @@ class SearchRequest(BaseModel):
     """
 
     query: str = Field(
-        ..., 
+        ...,
         min_length=1,
-        example="Which team uses high pressing?", 
+        example="Which team uses high pressing?",
     )
     n_results: int = Field(
         default=3,
@@ -26,12 +28,23 @@ class SearchRequest(BaseModel):
         description="Source IDs to search in",
         examples=[["ucl_2025", "football_profiles"]]
     )
+    document_ids: Optional[list[str]] = Field(
+        default=None,
+        description=(
+            "Explicit document IDs to restrict the search to (Phase 2C). "
+            "Never inferred from the query - omit or leave empty for no "
+            "filtering, the default. Not supported with retrieval_mode "
+            "\"hybrid\"."
+        ),
+        examples=[["doc_1"]]
+    )
 
     class Config:
         json_schema_extra = {
             "example": {
                 "query": "Which team uses high pressing?",
                 "n_results": 3,
-                "source_ids": ["ucl_2025"]
+                "source_ids": ["ucl_2025"],
+                "document_ids": None
             }
         }

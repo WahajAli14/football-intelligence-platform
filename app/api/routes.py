@@ -68,7 +68,9 @@ async def search_documents(request: SearchRequest):
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
     source_ids = [source_id.value for source_id in request.source_ids]
-    raw_results = search_accross_sources(request.query, source_ids, request.n_results)
+    raw_results = search_accross_sources(
+        request.query, source_ids, request.n_results, document_ids=request.document_ids
+    )
     formatted_results = []
 
     for doc in raw_results:
@@ -106,6 +108,7 @@ async def ask_football_question(request: SearchRequest):
             query=request.query,
             source_ids=source_ids,
             n_results=request.n_results,
+            document_ids=request.document_ids,
         )
     except LLMServiceError as e:
         raise HTTPException(status_code=e.status_code, detail=str(e))

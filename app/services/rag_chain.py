@@ -22,9 +22,13 @@ class RAGChain:
         source_ids: List[str] = None,
         n_results: int = None,
         retrieval_mode: str = None,
+        document_ids: List[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         Retrieve relevant documents from one or more sources.
+
+        document_ids: explicit document scope (Phase 2C) - never inferred
+            from the query. None/empty means no filtering, the default.
         """
 
         n = n_results if n_results else self.n_results
@@ -36,12 +40,14 @@ class RAGChain:
                 source_ids=source_ids,
                 n_results=n,
                 retrieval_mode=mode,
+                document_ids=document_ids,
             )
 
         return retrieve_similar_documents(
             query=query,
             n_results=n,
             retrieval_mode=mode,
+            document_ids=document_ids,
         )
 
     def generate(self, query: str, retrieved_docs: List[Dict[str, Any]]) -> str:
@@ -61,6 +67,7 @@ class RAGChain:
         source_ids: List[str] = None,
         n_results: int = None,
         retrieval_mode: str = None,
+        document_ids: List[str] = None,
     ) -> Dict[str, Any]:
         """
         Complete RAG pipeline: Retrieve → Generate.
@@ -71,12 +78,18 @@ class RAGChain:
             n_results: Number of documents to retrieve
             retrieval_mode: "dense" or "hybrid" (defaults to the chain's
                 own retrieval_mode if not given - see RAGChain.__init__)
+            document_ids: explicit document scope (Phase 2C), never
+                inferred from the query - None/empty means no filtering
 
         Returns:
             Dictionary with query, answer, and retrieved documents
         """
         retrieved_docs = self.retrieve(
-            query, source_ids=source_ids, n_results=n_results, retrieval_mode=retrieval_mode
+            query,
+            source_ids=source_ids,
+            n_results=n_results,
+            retrieval_mode=retrieval_mode,
+            document_ids=document_ids,
         )
 
         if not retrieved_docs:

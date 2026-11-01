@@ -13,19 +13,27 @@ from app.config.rag import (
 from app.services.bm25_index import combined_bm25_search
 
 
-def _dense_search(query: str, collection_name: str, n_results: int):
+def _dense_search(query: str, collection_name: str, n_results: int, document_ids=None):
     """
     Raw dense/embedding retrieval against Chroma. Returns chunks ranked by
     similarity, highest first - no fusion, no BM25 involved.
+
+    document_ids: explicit document scope (Phase 2C) - restricts the query
+    to chunks whose parent_id is in this list, via Chroma's own `where`
+    filter. None/empty means no filtering - exact prior behavior.
     """
     client = get_chroma_client()
     collection = get_or_create_collection(client, collection_name)
 
-    results = collection.query(
-        query_texts=[query],
-        n_results=n_results,
-        include=["documents", "metadatas", "distances"]
-    )
+    query_kwargs = {
+        "query_texts": [query],
+        "n_results": n_results,
+        "include": ["documents", "metadatas", "distances"],
+    }
+    if document_ids:
+        query_kwargs["where"] = {"parent_id": {"$in": list(document_ids)}}
+
+    results = collection.query(**query_kwargs)
 
     retrieved_docs = []
 
@@ -153,6 +161,7 @@ def retrieve_similar_documents(
     collection_name: str = DEFAULT_COLLECTION,
     n_results: int = DEFAULT_N_RESULTS,
     retrieval_mode: str = DEFAULT_RETRIEVAL_MODE,
+    document_ids=None,
 ):
     """
     Retrieve similar documents from a collection. Returns a list of
@@ -164,9 +173,20 @@ def retrieve_similar_documents(
         "hybrid" - dense + BM25 candidates fused with Reciprocal Rank
             Fusion (Phase 2B). similarity_score becomes the fused RRF
             score in this mode, not a cosine-distance transform.
+
+    document_ids: explicit document scope (Phase 2C), never inferred from
+        the query - None/empty means no filtering. Only supported in
+        "dense" mode for now; raises in "hybrid" rather than silently
+        ignoring the filter.
     """
+    if document_ids and retrieval_mode == RETRIEVAL_MODE_HYBRID:
+        raise ValueError(
+            "document_ids filtering is not supported with retrieval_mode='hybrid' yet "
+            "(Phase 2C-v1 is dense-only) - pass retrieval_mode='dense' or omit document_ids."
+        )
+
     if retrieval_mode == RETRIEVAL_MODE_DENSE:
-        results = _dense_search(query, collection_name, n_results)
+        results = _dense_search(query, collection_name, n_results, document_ids=document_ids)
     elif retrieval_mode == RETRIEVAL_MODE_HYBRID:
         results = _retrieve_hybrid(query, [(collection_name, None, None)], n_results)
     else:
@@ -183,10 +203,22 @@ def search_accross_sources(
     source_ids: list[str],
     n_results: int = DEFAULT_N_RESULTS,
     retrieval_mode: str = DEFAULT_RETRIEVAL_MODE,
+    document_ids=None,
 ) -> list[dict]:
     """
         Search across multiple sources and return results.
+
+        document_ids: explicit document scope (Phase 2C), never inferred
+        from the query - None/empty means no filtering. Only supported in
+        "dense" mode for now; raises in "hybrid" rather than silently
+        ignoring the filter.
     """
+    if document_ids and retrieval_mode == RETRIEVAL_MODE_HYBRID:
+        raise ValueError(
+            "document_ids filtering is not supported with retrieval_mode='hybrid' yet "
+            "(Phase 2C-v1 is dense-only) - pass retrieval_mode='dense' or omit document_ids."
+        )
+
     if retrieval_mode == RETRIEVAL_MODE_HYBRID:
         collections = []
         for source_id in source_ids:
@@ -205,6 +237,7 @@ def search_accross_sources(
                 collection_name,
                 n_results,
                 retrieval_mode,
+                document_ids=document_ids,
             )
             for result in source_results:
                 metadata = result.setdefault("metadata", {})
