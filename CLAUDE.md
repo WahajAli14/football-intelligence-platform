@@ -55,13 +55,15 @@ Phase 1 is complete.
   (`clean_and_merge_chunks`, the `_v2` collections) is a confirmed,
   independent win, kept regardless of the hybrid outcome. Full numbers in
   `EVAL_FINDINGS.md`.
-- 🔶 2C — scope narrowed to what the corpus actually supports (see
+- ✅ 2C — scope narrowed to what the corpus actually supports (see
   `PROJECT_PLAN.md`): **2C-v1** (explicit `document_ids`, dense-only,
   via Chroma's `where={"parent_id": {"$in": [...]}}`) is implemented
   (`app/models/request/search.py`, `app/api/routes.py`,
-  `app/services/rag_chain.py`, `app/services/rag_service.py`), pending
-  a retrieval-only validation close-out — no full RAGAS run needed,
-  filtering is deterministic. **2C-v2** (`team` metadata) is deferred —
+  `app/services/rag_chain.py`, `app/services/rag_service.py`) and
+  validated — 4 deterministic cases (no-filter parity, correct-filter
+  scoping, nonexistent-ID empty result, multi-ID union), all passed,
+  zero OpenAI calls since filtering is deterministic. **2C-v2** (`team`
+  metadata) is deferred —
   `football_profiles` is already one document per team, so it adds
   nothing yet. Competition/season/page/section filtering is deferred
   indefinitely — not present in this corpus to filter on.

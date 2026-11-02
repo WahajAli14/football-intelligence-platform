@@ -463,20 +463,22 @@ Of the originally listed dimensions (source, document, team, competition,
 season, page/section), only two are actually supported by this corpus
 today:
 
-- **2C-v1 - `document_ids` (dense-only). Implemented, pending retrieval-only
-  validation close-out.** Explicit `document_ids` on `SearchRequest`,
-  threaded through `/search`, `/ask`, `RAGChain`, and
+- **2C-v1 - `document_ids` (dense-only). Implemented and VALIDATED;
+  CLOSED.** Explicit `document_ids` on `SearchRequest`, threaded through
+  `/search`, `/ask`, `RAGChain`, and
   `search_accross_sources`/`retrieve_similar_documents`, filtering via
   Chroma's `where={"parent_id": {"$in": [...]}}`. `document_ids` combined
   with `retrieval_mode="hybrid"` raises `ValueError` rather than silently
   ignoring the filter. No `document_ids` means no filtering - identical to
-  pre-2C behavior. Validation: no-filter parity with the dense baseline,
-  correct-filter chunks all belong to the requested parent_id(s), a
-  wrong/nonexistent ID returns zero results with no leakage, and a
-  multi-ID list unions correctly — all computable with the existing gold
-  labels and zero OpenAI calls, no full RAGAS run needed since filtering is
-  deterministic (it either returns chunks from the specified documents or
-  it does not).
+  pre-2C behavior. Validated with 4 deterministic cases, zero OpenAI calls
+  (filtering is deterministic - it either returns chunks from the
+  specified documents or it does not - so no full RAGAS run was needed):
+  (1) no `document_ids` → chunk IDs identical to the pre-2C baseline for
+  all 23 questions, not just metric-equal; (2) a correct single ID →
+  every returned chunk's `parent_id` matches; (3) a nonexistent ID →
+  zero results, no fallback to unfiltered search; (4) a multi-ID list →
+  results correctly span all requested documents, nothing outside them.
+  All 4 passed. See EVAL_FINDINGS.md.
 - **2C-v2 - `team` metadata (deferred, no current use case).**
   `football_profiles` is already one document per team, so
   `team="Arsenal"` and `document_ids=["<arsenal_doc_id>"]` would behave

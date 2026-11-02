@@ -301,6 +301,24 @@ retrieval-quality technique like hybrid search or reranking, and the
 caller (UI, conversation state, access control) is expected to supply it,
 never the retrieval layer guessing it from the query text.
 
+**2C-v1 validation - 4 deterministic cases, all passed, zero OpenAI
+calls.** Filtering is deterministic (it either returns chunks from the
+specified documents or it does not), so no full RAGAS run was needed:
+
+1. No `document_ids` → `retrieved_chunk_ids` identical to the pre-2C
+   baseline across all 23 questions, diffed directly (not just
+   metric-equal - the Phase 2B hybrid comparison already showed identical
+   metrics can hide different chunk IDs underneath).
+2. Correct single `document_ids=["doc_5"]` → all 3 returned chunks had
+   `parent_id: doc_5`, nothing from any other document.
+3. Nonexistent `document_ids=["doc_999"]` → 0 results, no fallback to
+   unfiltered search.
+4. Multi-document `document_ids=["doc_5", "doc_1"]` → results correctly
+   spanned both requested documents (Bayern + Arsenal chunks
+   interleaved by relevance), nothing from any other document.
+
+**2C-v1 closed.**
+
 ## 2D-1 experiment spec locked before implementation
 
 Phase 2B's hybrid retrieval fused dense and BM25 via RRF down to a final
