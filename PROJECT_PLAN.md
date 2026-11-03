@@ -527,25 +527,10 @@ Query
 nDCG@k becomes the most informative deterministic metric at this stage,
 since reranking is fundamentally an ordering problem.
 
-For advanced experimentation in V3, a JEV-based stage may be evaluated after
-the standard reranker:
-
-```text
-Candidate Retrieval
-        ↓
-Hybrid Search
-        ↓
-Reranker
-        ↓
-JEV
-        ↓
-Final Context
-        ↓
-LLM
-```
-
-JEV is optional. It should only remain if evaluation shows measurable
-improvement over the simpler reranking pipeline.
+For advanced experimentation in V3, a Jev-based stage may be evaluated
+after the standard reranker - see "JEV Note" under V3 for what Jev
+actually is, now that it's been identified, and why it stays deferred
+there rather than pulled into Phase 2.
 
 Measure every major retrieval change against the baseline — both RAGAS and
 the deterministic metrics from 2A.
@@ -937,27 +922,42 @@ measurable limitation.
 
 ### JEV Note
 
-JEV remains intentionally undefined in this plan until its exact role and
-definition are agreed.
+"JEV" is now identified as **Jev**, a hosted judge/reranker API from
+TypeSafe AI (`POST https://api.typesafe.ai/v1/systemone`) that scores each
+candidate against the query with a typed relevance judgment and batches
+many candidates per request. Reported numbers (vendor blogs, one narrow
+non-English academic preprint - **not independently verified, treat with
+the same skepticism as any "more advanced" claim per this plan's own
+experiment discipline**) show real gains over both BM25-only and
+cross-encoder baselines on nDCG@10/MRR. Pricing is cheap ($0.042/million
+input tokens, output free), but three things distinguish it from the
+local reranker (Phase 2D) this plan already uses:
 
-For now, it is only an optional advanced experiment in the flow:
+- **Cost**: near-zero at this corpus's scale, but non-zero and external -
+  unlike the fully local, free `cross-encoder/ms-marco-MiniLM-L-6-v2`.
+- **Data leaves the machine**: every reranked query + candidate passage
+  goes to TypeSafe's API, a new third-party data-sharing surface that
+  local reranking and even BM25/dense retrieval don't have.
+- **Access may be gated** - TypeSafe reportedly paused new signups around
+  2026-09-22; confirm current access before planning around it.
 
-```text
-Candidate Retrieval
-        ↓
-Hybrid Search
-        ↓
-Reranker
-        ↓
-JEV
-        ↓
-Final Context
-        ↓
-LLM
-```
+It remains deliberately deferred to V3, not pulled forward into Phase 2 -
+Phase 2's reranking experiment (2D) is already locked to the free, local
+cross-encoder, and should be evaluated and decided on its own first.
+If picked up later: implement as its own explicitly-flagged
+`retrieval_mode` (e.g. `"jev"`), gated behind a required `JEV_API_KEY` env
+var so it only ever runs when explicitly opted into, never as a silent
+default - same explicit-only philosophy as `document_ids` (Phase 2C) never
+being silently inferred. Keep provider-specific client code behind its own
+module (mirroring `llm_service.py`'s boundary for OpenAI), fetch the real
+official request/response schema from TypeSafe's docs before writing any
+client rather than trusting third-party summaries, and evaluate against
+the same Recall@3/Precision@3/MRR/nDCG@3 plus union-recall diagnostic used
+for 2D - keep/reject on evidence, same as every other retrieval experiment
+in this plan.
 
-It is not a V1 requirement and should only be retained if it demonstrates
-measurable value.
+It is not a V1 requirement and should only be built, and only kept, if it
+demonstrates measurable value over the local reranker.
 
 ## 13. V3 - Advanced Intelligence
 
