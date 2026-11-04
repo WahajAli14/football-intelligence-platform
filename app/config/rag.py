@@ -27,3 +27,12 @@ HYBRID_CANDIDATE_POOL = 20
 # paper (PROJECT_PLAN.md Phase 2B). Fixed, not tuned, so this stays a single
 # clean variable change against the frozen baseline.
 RRF_K = 60
+
+# --- Phase 2D-1: reranking ---
+# Locked experiment spec (PROJECT_PLAN.md Phase 2D) - not tuned mid-run.
+# Unlike 2B's hybrid mode, candidates are NOT fused with RRF first: the
+# deduplicated union of each method's own top-N is handed to the reranker
+# intact, since RRF pre-fusion is exactly what underperformed in 2B.
+RETRIEVAL_MODE_RERANK = "rerank"
+RERANK_CANDIDATE_POOL = 10  # per retriever (dense, BM25), before dedup
+RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"

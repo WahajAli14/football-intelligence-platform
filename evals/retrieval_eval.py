@@ -27,8 +27,10 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from app.config.rag import DEFAULT_N_RESULTS, DEFAULT_RETRIEVAL_MODE
+from app.config.rag import DEFAULT_N_RESULTS, DEFAULT_RETRIEVAL_MODE, RETRIEVAL_MODE_RERANK
+from app.config.source import get_source_config
 from app.services.rag_chain import get_rag_chain
+from app.services.rag_service import _build_rerank_candidates
 from evals.gold_labels import gold_labels as gold_labels_v1
 from evals.gold_labels_v2 import gold_labels_v2
 from evals.gold_metrics import _mean, _mrr, _ndcg_at_k, _precision_at_k, _recall_at_k
@@ -69,7 +71,7 @@ def main():
         retrieved_chunk_ids = [d["chunk_id"] for d in retrieved_docs]
         gold = set(GOLD_LABELS[item["user_input"]]["relevant_chunk_ids"])
 
-        rows.append({
+        row = {
             "user_input": item["user_input"],
             "category": item["category"],
             "retrieved_chunk_ids": retrieved_chunk_ids,
@@ -78,7 +80,22 @@ def main():
             "precision_at_k": _precision_at_k(retrieved_chunk_ids, gold),
             "mrr": _mrr(retrieved_chunk_ids, gold),
             "ndcg_at_k": _ndcg_at_k(retrieved_chunk_ids, gold),
-        })
+        }
+
+        # Phase 2D-1 diagnostic: recall over the pre-rerank union, so a low
+        # final recall can be attributed to the reranker (gold chunk was in
+        # the union, got ranked out) vs. candidate generation (gold chunk
+        # was never in the union at all) rather than guessed at after the
+        # fact the way Phase 2B's candidate-pool analysis had to be.
+        if RETRIEVAL_MODE == RETRIEVAL_MODE_RERANK:
+            collections = [
+                (get_source_config(sid)["collection"], None, None)
+                for sid in item["source_ids"]
+            ]
+            union_chunk_ids = [c["chunk_id"] for c in _build_rerank_candidates(item["user_input"], collections)]
+            row["union_recall"] = _recall_at_k(union_chunk_ids, gold)
+
+        rows.append(row)
 
     scored_rows = [r for r in rows if not r["gold_is_empty"]]
     empty_rows = [r for r in rows if r["gold_is_empty"]]
@@ -88,6 +105,8 @@ def main():
           f"{len(failures)} failed retrieval")
 
     aggregate = {m: _mean([r[m] for r in scored_rows]) for m in METRICS}
+    if RETRIEVAL_MODE == RETRIEVAL_MODE_RERANK:
+        aggregate["union_recall"] = _mean([r["union_recall"] for r in scored_rows])
     print("\nOverall aggregate:")
     for name, value in aggregate.items():
         print(f"  {name}: {value}")

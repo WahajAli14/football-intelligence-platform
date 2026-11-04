@@ -7,10 +7,28 @@ from app.config.rag import (
     DEFAULT_RETRIEVAL_MODE,
     RETRIEVAL_MODE_DENSE,
     RETRIEVAL_MODE_HYBRID,
+    RETRIEVAL_MODE_RERANK,
     HYBRID_CANDIDATE_POOL,
+    RERANK_CANDIDATE_POOL,
     RRF_K,
 )
 from app.services.bm25_index import combined_bm25_search
+from app.services.reranker import rerank as cross_encoder_rerank
+
+# Phase 2C-v1's document_ids filter is dense-query-level (Chroma's own
+# `where`); neither hybrid's nor rerank's candidate-pool construction
+# (_dense_search_multi/_bm25_search_multi) accepts it yet. Raise rather
+# than silently ignoring the filter - see retrieve_similar_documents'
+# docstring.
+_MODES_WITHOUT_DOCUMENT_ID_SUPPORT = {RETRIEVAL_MODE_HYBRID, RETRIEVAL_MODE_RERANK}
+
+
+def _check_document_ids_supported(document_ids, retrieval_mode):
+    if document_ids and retrieval_mode in _MODES_WITHOUT_DOCUMENT_ID_SUPPORT:
+        raise ValueError(
+            f"document_ids filtering is not supported with retrieval_mode={retrieval_mode!r} "
+            "yet - pass retrieval_mode='dense' or omit document_ids."
+        )
 
 
 def _dense_search(query: str, collection_name: str, n_results: int, document_ids=None):
@@ -156,6 +174,52 @@ def _retrieve_hybrid(query: str, collections, n_results: int):
     return _rrf_fuse([dense_candidates, bm25_candidates], n_results)
 
 
+def _build_rerank_candidates(query: str, collections, pool: int = RERANK_CANDIDATE_POOL):
+    """
+    collections: list of (collection_name, source_id_or_None, source_title_or_None)
+
+    Phase 2D-1: dense top-`pool` + BM25 top-`pool` (via _dense_search_multi/
+    _bm25_search_multi, same as hybrid mode), deduplicated by chunk_id - NOT
+    fused with RRF first. 2B's hybrid mode showed RRF-fusing before anything
+    else sees the pool is exactly what underperformed, so the reranker here
+    gets the raw union intact instead. A chunk found by both methods keeps
+    whichever copy was seen first (dense is queried first); the two methods
+    retrieve from the same underlying chunk store, so the content/metadata
+    is identical either way.
+
+    Returned separately from the reranking step itself so eval tooling can
+    measure recall over this pre-rerank union on its own - distinguishing a
+    reranker failure (gold chunk was here, got ranked out) from a candidate-
+    generation failure (gold chunk was never here to begin with).
+    """
+    dense_candidates = _dense_search_multi(query, collections, pool)
+    bm25_candidates = _bm25_search_multi(query, collections, pool)
+
+    seen = set()
+    union = []
+    for candidate in dense_candidates + bm25_candidates:
+        if candidate["chunk_id"] in seen:
+            continue
+        seen.add(candidate["chunk_id"])
+        union.append(candidate)
+
+    return union
+
+
+def _retrieve_rerank(query: str, collections, n_results: int):
+    """
+    collections: list of (collection_name, source_id_or_None, source_title_or_None)
+
+    Phase 2D-1: builds the deduplicated dense+BM25 union
+    (_build_rerank_candidates) and re-scores it with a cross-encoder
+    (app/services/reranker.py), keeping the top n_results. similarity_score
+    in the result is the cross-encoder's own score, not a cosine-distance
+    or RRF-fused value - not comparable across retrieval_mode values.
+    """
+    candidates = _build_rerank_candidates(query, collections)
+    return cross_encoder_rerank(query, candidates, n_results)
+
+
 def retrieve_similar_documents(
     query: str,
     collection_name: str = DEFAULT_COLLECTION,
@@ -173,22 +237,23 @@ def retrieve_similar_documents(
         "hybrid" - dense + BM25 candidates fused with Reciprocal Rank
             Fusion (Phase 2B). similarity_score becomes the fused RRF
             score in this mode, not a cosine-distance transform.
+        "rerank" - dense + BM25 candidates, deduplicated (not RRF-fused)
+            and re-scored by a cross-encoder (Phase 2D-1). similarity_score
+            becomes the cross-encoder's own score in this mode.
 
     document_ids: explicit document scope (Phase 2C), never inferred from
         the query - None/empty means no filtering. Only supported in
-        "dense" mode for now; raises in "hybrid" rather than silently
-        ignoring the filter.
+        "dense" mode for now; raises in "hybrid"/"rerank" rather than
+        silently ignoring the filter.
     """
-    if document_ids and retrieval_mode == RETRIEVAL_MODE_HYBRID:
-        raise ValueError(
-            "document_ids filtering is not supported with retrieval_mode='hybrid' yet "
-            "(Phase 2C-v1 is dense-only) - pass retrieval_mode='dense' or omit document_ids."
-        )
+    _check_document_ids_supported(document_ids, retrieval_mode)
 
     if retrieval_mode == RETRIEVAL_MODE_DENSE:
         results = _dense_search(query, collection_name, n_results, document_ids=document_ids)
     elif retrieval_mode == RETRIEVAL_MODE_HYBRID:
         results = _retrieve_hybrid(query, [(collection_name, None, None)], n_results)
+    elif retrieval_mode == RETRIEVAL_MODE_RERANK:
+        results = _retrieve_rerank(query, [(collection_name, None, None)], n_results)
     else:
         raise ValueError(f"Unknown retrieval_mode: {retrieval_mode!r}")
 
@@ -210,22 +275,21 @@ def search_accross_sources(
 
         document_ids: explicit document scope (Phase 2C), never inferred
         from the query - None/empty means no filtering. Only supported in
-        "dense" mode for now; raises in "hybrid" rather than silently
-        ignoring the filter.
+        "dense" mode for now; raises in "hybrid"/"rerank" rather than
+        silently ignoring the filter.
     """
-    if document_ids and retrieval_mode == RETRIEVAL_MODE_HYBRID:
-        raise ValueError(
-            "document_ids filtering is not supported with retrieval_mode='hybrid' yet "
-            "(Phase 2C-v1 is dense-only) - pass retrieval_mode='dense' or omit document_ids."
-        )
+    _check_document_ids_supported(document_ids, retrieval_mode)
 
-    if retrieval_mode == RETRIEVAL_MODE_HYBRID:
+    if retrieval_mode in (RETRIEVAL_MODE_HYBRID, RETRIEVAL_MODE_RERANK):
         collections = []
         for source_id in source_ids:
             source_config = get_source_config(source_id)
             collections.append((source_config["collection"], source_id, source_config["title"]))
 
-        top_results = _retrieve_hybrid(query, collections, n_results)
+        if retrieval_mode == RETRIEVAL_MODE_HYBRID:
+            top_results = _retrieve_hybrid(query, collections, n_results)
+        else:
+            top_results = _retrieve_rerank(query, collections, n_results)
     else:
         all_results = []
         for source_id in source_ids:
