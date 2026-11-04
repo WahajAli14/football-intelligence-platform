@@ -67,11 +67,18 @@ Phase 1 is complete.
   `football_profiles` is already one document per team, so it adds
   nothing yet. Competition/season/page/section filtering is deferred
   indefinitely — not present in this corpus to filter on.
-- ⬜ 2D (reranking) — not started, spec locked in `PROJECT_PLAN.md`
-  (rerank the deduped union of dense-top-10 and BM25-top-10, not the
-  RRF-fused top-k; reranker `cross-encoder/ms-marco-MiniLM-L-6-v2`,
-  final_k=3, both fixed before running). Do not add memory or agents
-  (Phase 3+) without discussing it first.
+- 🔶 2D (reranking) — in progress, overall keep/reject call still
+  pending. **2D-1** (rerank the deduped union of dense-top-10 and
+  BM25-top-10, not RRF-fused, via `cross-encoder/ms-marco-MiniLM-L-6-v2`,
+  final_k=3): small aggregate edge over dense, but with real volatility
+  underneath; Oracle Recall@3 diagnostics show the bottleneck is the
+  reranker's own selection judgment, not candidate generation or the
+  3-slot output cap. **2D-2** (candidate pool 10→20): **evaluated,
+  rejected** — union/oracle recall improved but every final-quality
+  metric got worse (more candidates just gave the already-struggling
+  reranker more distractors), plus +42% latency. `RERANK_CANDIDATE_POOL`
+  stays `10`. Full numbers in `EVAL_FINDINGS.md`. Do not add memory or
+  agents (Phase 3+) without discussing it first.
 
 Before running a full `evals/run_eval.py` pass (generation + RAGAS judge,
 ~19 OpenAI calls per question) while iterating on a retrieval change, use

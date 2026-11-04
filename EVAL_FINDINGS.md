@@ -353,3 +353,111 @@ Locked before running, not tuned mid-experiment:
   union, reranker didn't surface it) from a candidate-generation failure
   (gold chunk was never in the union) from the start, rather than
   diagnosing it after the fact the way 2B's candidate-pool analysis did.
+
+## Phase 2D-1 result: small aggregate edge, real volatility underneath
+
+23-question `evals/retrieval_eval.py` run, v2 corpus, `pool=10`:
+
+```text
+config              recall@k  precision@k   MRR     nDCG@k   union_recall
+v2-dense (baseline)  0.5833     0.4127     0.7063    0.5856        -
+v2-rerank (2D-1)     0.6028     0.3968     0.7381    0.5930      0.8504
+```
+
+A small edge over dense on 3 of 4 metrics, but underneath: 4 gains
+(including two full 0.0→1.0 rescues), 5 losses (including two full
+1.0→0.0 collapses), 12 unchanged, across 21 scored questions - not a
+clean win on inspection.
+
+**Traced both full-collapse losses to root cause, verified directly
+against the real ChromaDB collection, not guessed at:**
+
+1. **Candidate-generation gap.** One gold chunk ranked 19th in dense and
+   18th in BM25 out of the full 1098-chunk collection - just outside the
+   `pool=10` cutoff per retriever, not deeply buried.
+2. **Reranker misjudgment with a genuine confound.** A different chunk
+   consistently outranked the correct gold chunk on two separate
+   questions. Traced directly to the raw PDF extraction output (via
+   `DocumentLoader.load_pdf()`, before any chunking code runs): the
+   original text itself breaks mid-word - `"...gained most from the
+   counter-press\n\nDEFENCE TO ATTACK\nPARIS' COUNTERATTACKING
+   MENACE..."` - a genuine PDF-extraction artifact, not a bug in this
+   project's own `_chunk_paragraph`/`_chunk_fixed` logic (confirmed: the
+   paragraph is only 229 characters, well under `chunk_size=400`, so our
+   own chunker isn't the one making the cut). Repairing the truncation
+   likely wouldn't fully fix the ranking problem, though: even whole,
+   that chunk legitimately mentions teams gaining from counter-pressing -
+   it's topically adjacent, not nonsense. The deeper issue is this
+   specific MS MARCO-trained cross-encoder not reliably distinguishing
+   primary topic from secondary mention, or team-level aggregate stats
+   from player-level anecdotes (Pedri, João Neves) that mention the same
+   term.
+
+## Phase 2D-2: candidate pool expansion (10→20) - evaluated, rejected
+
+Tested whether the candidate-generation gap (cause 1 above) is fixable by
+widening the pool, deliberately without touching the PDF extraction
+artifact (cause 2) in the same run - re-ingesting to fix extraction would
+change every chunk ID and invalidate the gold labels, making the result
+non-comparable. One variable at a time.
+
+Added two diagnostics this pass: **Oracle Recall@3** (`min(3, |pool ∩
+gold|) / |gold|` - the best Recall@3 any selector could achieve from the
+exact candidate pool, separating a 3-slot capacity limit from the
+reranker's own selection judgment) and per-stage **latency** (candidate
+generation vs. reranking measured separately). Also fixed a real
+inefficiency found while adding latency measurement:
+`evals/retrieval_eval.py` was rebuilding the candidate pool a second time
+just to compute the union-recall diagnostic, after `RAGChain.retrieve()`
+had already built it once internally - doubling candidate-generation cost
+per question. Now built once and reused for both the diagnostics and the
+reranking step.
+
+**Hypothesis recorded before running** (deliberately non-directional):
+widening the pool should improve or preserve union recall (it can only
+add candidates), but final Recall@3 could improve, stay flat, or get
+worse - more candidates means more distractors too, and 2D-1 already
+showed this reranker doesn't reliably separate primary evidence from
+plausible-but-wrong secondary mentions.
+
+**Result:**
+
+```text
+metric                 N=10 (2D-1)   N=20 (2D-2)    delta
+recall@3                 0.6028        0.5933     -0.0095
+precision@3              0.3968        0.3810     -0.0158
+MRR                       0.7381        0.7222     -0.0159
+nDCG@3                    0.5930        0.5818     -0.0112
+union_recall              0.8504        0.9040     +0.0536
+oracle_recall@3           0.8385        0.8861     +0.0476
+mean total latency (s)    0.875         1.246      +0.371
+  candidate-gen latency    0.382         0.447      +0.065
+  rerank latency           0.493         0.798      +0.305
+```
+
+The "could get worse" branch of the hypothesis is exactly what happened.
+`union_recall` and `oracle_recall@3` both improved - the wider pool
+genuinely found more correct candidates, as expected. But **every final
+metric got worse anyway**: the predicted "more candidates, more
+distractors" failure mode, not a coincidence. All of the degradation is
+isolated to the `uefa_report` category (0.45 → 0.4167); every other
+category is byte-identical to the N=10 run - exactly the corpus section
+where the team-vs-player/primary-vs-secondary-topic confusion was already
+hand-traced above. A wider pool just handed that already-confused
+reranker more ways to get it wrong, specifically where it was already
+struggling. Latency also increased 42% overall (mostly reranking time,
++62%, from scoring twice as many candidates).
+
+**The Oracle Recall@3 diagnostic sharpens the whole 2D-1/2D-2 picture**:
+at N=10, Oracle Recall@3 (0.8385) sits very close to union_recall
+(0.8504) - the 3-slot output cap itself costs almost nothing (1.2
+points). That means **nearly the entire 0.8385 → 0.6028 gap (23.6 points)
+is the reranker's own selection judgment**, not a candidate-generation or
+output-capacity problem.
+
+**Decision: `RERANK_CANDIDATE_POOL` stays `10`.** Widening the pool
+doesn't fix a weak ranker, it just gives it more rope. Any further
+improvement attempt should target the reranker's judgment itself - a
+different/stronger model, as its own separately-flagged experiment, not
+tuned against this same 21-question set - rather than candidate-pool
+size.

@@ -527,6 +527,120 @@ Query
 nDCG@k becomes the most informative deterministic metric at this stage,
 since reranking is fundamentally an ordering problem.
 
+**2D-1 result (pool=10, v2 corpus): recall=0.6028, precision=0.3968,
+MRR=0.7381, nDCG=0.5930, union_recall=0.8504** - a small aggregate edge
+over dense (0.5833/0.4127/0.7063/0.5856), but with real volatility
+underneath (4 gains, 5 losses, 12 unchanged on recall across 21 scored
+questions) - not yet a clean keep/reject decision. The 85.04%→60.28% gap
+between pre-rerank union recall and final Recall@3 was investigated on the
+two full-collapse losses and traced to two separate, verified causes:
+
+1. **A real candidate-generation gap**: on one question, one of two gold
+   chunks ranked 19th in dense and 18th in BM25 (out of 1098 chunks) -
+   just outside the `pool=10` cutoff, not deeply buried.
+2. **A reranker misjudgment with a genuine confound**: a different chunk,
+   truncated mid-word by a verified PDF-extraction artifact (the raw
+   extracted text itself breaks "counter-pressing" into "counter-press" +
+   a new, unrelated heading - confirmed directly from `DocumentLoader`'s
+   raw output, before any of this project's own chunking code runs),
+   consistently outranks the correct gold chunk. Fixing the truncation
+   likely won't resolve this, because even whole, that chunk is
+   legitimately topically adjacent (mentions teams gaining from
+   counter-pressing) - the deeper issue is this specific MS MARCO-trained
+   cross-encoder not reliably distinguishing primary topic from secondary
+   mention, or team-level stats from player-level anecdotes mentioning the
+   same term.
+
+### 2D-2 - candidate pool expansion - EVALUATED; REJECTED
+
+Tests whether cause 1 (candidate-generation gap) is fixable by widening
+the pool, while deliberately *not* touching cause 2 (the PDF extraction
+artifact) in the same experiment - re-ingesting to fix extraction changes
+every chunk ID, which would invalidate the gold labels and make this
+experiment's result non-comparable to 2D-1. One variable at a time.
+
+**Locked spec**: `candidate_pool_per_retriever = 20` (up from 2D-1's 10),
+everything else unchanged - same reranker, same v2 corpus, same gold
+labels, same `final_k = 3`, same 23 questions.
+
+**Hypothesis, recorded before running** (deliberately non-directional -
+see below for why): increasing the pool from 10 to 20 is expected to
+improve or preserve pre-rerank union recall, since it can only add
+candidates, never remove them. Final Recall@3 may improve, stay the same,
+or *get worse* - a wider pool adds both additional correct candidates
+*and* additional distractors, and this reranker has already demonstrated
+(in 2D-1) that it doesn't reliably separate primary evidence from
+plausible-but-wrong secondary mentions. A specific predicted recall range
+is not recorded, deliberately: more candidates could just as easily give
+the reranker more ways to get it wrong as more ways to get it right.
+
+**New diagnostic: Oracle Recall@3** - `min(3, |pool ∩ gold|) / |gold|`,
+computed directly from the already-built candidate pool (no extra
+retrieval). This separates two things the 2D-1 result's single
+union-recall number conflated:
+
+- **Capacity limit**: even a perfect selector can only fill 3 slots -
+  Oracle Recall@3 is the ceiling given that constraint alone.
+- **Selection limit**: the gap between Oracle Recall@3 and the actual
+  reranker's Recall@3 is attributable to the reranker's own judgment,
+  not to a 3-slot output limit or to candidate generation.
+
+**Also fixed in this pass**: `evals/retrieval_eval.py`'s rerank-mode
+diagnostic previously rebuilt the candidate pool a second time just to
+compute union recall, after `RAGChain.retrieve()` had already built it
+once internally - doubling candidate-generation cost per question. Now
+built once, reused for both the diagnostics and the reranking step, with
+candidate-generation time and reranking time measured and recorded
+separately, so a latency comparison between 2D-1 (pool=10) and 2D-2
+(pool=20) isn't contaminated by redundant work.
+
+**Caveat carried over from 2B**: only 21 of 23 questions have non-empty
+gold sets, already repeatedly hand-inspected while diagnosing 2D-1 - any
+result here is directional evidence for this corpus, not a statistically
+solid verdict, and should not be over-tuned against.
+
+**Result, N=10 (2D-1) vs N=20 (2D-2), v2 corpus, same 23 questions:**
+
+```text
+metric                 N=10 (2D-1)   N=20 (2D-2)    delta
+recall@3                 0.6028        0.5933     -0.0095
+precision@3              0.3968        0.3810     -0.0158
+MRR                       0.7381        0.7222     -0.0159
+nDCG@3                    0.5930        0.5818     -0.0112
+union_recall              0.8504        0.9040     +0.0536
+oracle_recall@3           0.8385        0.8861     +0.0476
+mean total latency (s)    0.875         1.246      +0.371
+  candidate-gen latency    0.382         0.447      +0.065
+  rerank latency           0.493         0.798      +0.305
+```
+
+The non-directional hypothesis's "could get worse" branch is exactly what
+happened. `union_recall` and `oracle_recall@3` both improved (+5.4 and
++4.8 points) - the wider pool genuinely found more correct candidates, as
+expected since it can only add, never remove. But **every final-quality
+metric got worse anyway** - this is the predicted "more candidates, more
+distractors" failure mode, not a coincidence. All of the degradation is
+isolated to the `uefa_report` category (0.45 → 0.4167); every other
+category is byte-identical - exactly the corpus section where the team-
+vs-player/primary-vs-secondary-topic confusion was already hand-traced in
+2D-1. A wider pool handed that already-confused reranker more ways to get
+it wrong, specifically where it was already struggling. Latency also
+increased 42% overall (mostly reranking - cross-encoder time nearly
+doubled, +62%, from scoring twice as many candidates).
+
+**At N=10, Oracle Recall@3 (0.8385) is very close to union_recall
+(0.8504)** - the 3-slot output cap itself costs almost nothing (1.2
+points), meaning **nearly the entire 0.8385 → 0.6028 gap (23.6 points) is
+the reranker's own selection judgment, not a candidate or capacity
+problem.** This sharpens the 2D-1 diagnosis: the bottleneck is squarely
+ranking quality, not candidate generation or output-slot capacity.
+
+**Decision: `RERANK_CANDIDATE_POOL` stays `10`.** Widening the pool
+doesn't fix a weak ranker, it just gives it more rope. Any further
+improvement attempt should target the reranker's judgment itself (a
+different/stronger model, as its own separately-flagged experiment - not
+tuned against this same 21-question set) rather than candidate-pool size.
+
 For advanced experimentation in V3, a Jev-based stage may be evaluated
 after the standard reranker - see "JEV Note" under V3 for what Jev
 actually is, now that it's been identified, and why it stays deferred
